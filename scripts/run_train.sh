@@ -27,7 +27,7 @@ cd /home/bmainbird/UL/sound-production/project && source venv/bin/activate
 # Stage 0 experiment: longer run on identity channel with stronger regularization
 python -m watermarking.train \
   --data-dir clips/ \
-  --epochs 4 \
+  --epochs 5 \
   --batch-size 4 \
   --n-bits 16 \
   --eps 0.025 \
@@ -37,8 +37,8 @@ python -m watermarking.train \
   --logit-reg 0.001 \
   --decoder-lr 5e-5 \
   --decoder-steps 2 \
-  --channel-mode none \
-  --max-steps-per-epoch 500
+  --channel-mode none
+  # --max-steps-per-epoch 500
 
 # Stage 1 experiment: mild noise channel after decoder stabilizes
 # python -m watermarking.train \
