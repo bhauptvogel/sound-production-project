@@ -274,7 +274,7 @@ def main():
     ax_snr.set_ylabel("SNR (dB)", color="tab:blue")
     ax_ber.set_ylabel("BER", color="tab:red")
     ax_ber.invert_yaxis()
-    ax_snr.set_xticks(np.arange(0.0, 1.01, 0.5))
+    ax_snr.set_xticks(np.arange(0.0, 1.01, 0.1))
     ax_snr.grid(True, alpha=0.3)
     fig.tight_layout()
 
