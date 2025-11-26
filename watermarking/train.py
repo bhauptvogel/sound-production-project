@@ -10,6 +10,7 @@ import torch
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from pathlib import Path
 from torch.utils.data import DataLoader
 
 from watermarking.stft_utils import STFTConfig
