@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # cd /home/bmainbird/UL/sound-production/project && source venv/bin/activate
+git pull
 cd /workspace/project
 source venv/bin/activate
 

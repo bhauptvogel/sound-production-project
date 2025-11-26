@@ -1,6 +1,6 @@
 # watermarking/channel.py
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Tuple
 
 import torch
@@ -12,7 +12,7 @@ from .stft_utils import STFTConfig, stft, istft
 
 @dataclass
 class ChannelConfig:
-    stft_cfg: STFTConfig = STFTConfig()
+    stft_cfg: STFTConfig = field(default_factory=STFTConfig)
     
     # Channel mode: "none" (identity), "noise_only", or "full" (all attacks)
     mode: str = "full"
