@@ -29,7 +29,7 @@ source venv/bin/activate
 # Shared experiment configuration
 DATA_DIR="clips/"
 EPOCHS=1
-BATCH=64
+BATCH=32
 NUM_BITS=8
 EPS=0.2
 ALPHA=0.0
