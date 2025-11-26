@@ -38,6 +38,7 @@ MASK_REG=0.0
 LOGIT_REG=0.0
 DECODER_LR=3e-4
 DECODER_STEPS=0
+SAVE_PT=0 # 1 = save checkpoints, 0 = don't save
 # MAX_STEPS=500
 
 run_stage() {
@@ -73,6 +74,7 @@ max-steps-epoch = ${MAX_STEPS:-None}
 plot-path       = ${PLOT_PATH}
 enc-checkpoint  = ${ENC_CKPT}
 dec-checkpoint  = ${DEC_CKPT}
+save-pt         = ${SAVE_PT}
 log-file        = ${LOG_FILE}
 ============================================================
 EOF
@@ -93,6 +95,7 @@ EOF
     --plot-path "${PLOT_PATH}" \
     --encoder-ckpt "${ENC_CKPT}" \
     --decoder-ckpt "${DEC_CKPT}" \
+    --save-pt "${SAVE_PT}" \
     --lr "${DECODER_LR}" | tee -a "${LOG_FILE}"
     # --max-steps-per-epoch "${MAX_STEPS}"
 }

@@ -61,6 +61,7 @@ class TrainingConfig:
     plot_path: str | None = None
     encoder_ckpt: str | None = None
     decoder_ckpt: str | None = None
+    save_pt: bool = True
 
     # STFT
     n_fft: int = 1024
@@ -354,13 +355,13 @@ def train(cfg: TrainingConfig):
         plt.close(fig)
         print(f"Saved training metrics plot to {output_path}")
 
-    if cfg.encoder_ckpt:
+    if cfg.save_pt and cfg.encoder_ckpt:
         enc_path = Path(cfg.encoder_ckpt)
         enc_path.parent.mkdir(parents=True, exist_ok=True)
         torch.save(encoder.state_dict(), enc_path)
         print(f"Saved encoder checkpoint to {enc_path}")
 
-    if cfg.decoder_ckpt:
+    if cfg.save_pt and cfg.decoder_ckpt:
         dec_path = Path(cfg.decoder_ckpt)
         dec_path.parent.mkdir(parents=True, exist_ok=True)
         torch.save(decoder.state_dict(), dec_path)
@@ -397,6 +398,8 @@ def parse_args() -> TrainingConfig:
                     help="Path to save encoder checkpoint")
     ap.add_argument("--decoder-ckpt", type=str, default=None,
                     help="Path to save decoder checkpoint")
+    ap.add_argument("--save-pt", type=int, default=1,
+                    help="Whether to save checkpoints (1=yes, 0=no)")
     args = ap.parse_args()
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -420,6 +423,7 @@ def parse_args() -> TrainingConfig:
         plot_path=args.plot_path,
         encoder_ckpt=args.encoder_ckpt,
         decoder_ckpt=args.decoder_ckpt,
+        save_pt=bool(args.save_pt),
     )
 
 
