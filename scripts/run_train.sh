@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-cd /home/bmainbird/UL/sound-production/project && source venv/bin/activate 
+# cd /home/bmainbird/UL/sound-production/project && source venv/bin/activate
+cd /workspace/project && source venv/bin/activate
 
 # ============================================================================
 # STAGED TRAINING APPROACH
