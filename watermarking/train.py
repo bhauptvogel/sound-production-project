@@ -174,6 +174,8 @@ def train(cfg: TrainingConfig):
             X_att_log = torch.log(X_att.abs() + 1e-7).unsqueeze(1)
 
             # Decoder adaptation step(s) (optional)
+            # When decoder_steps > 0, we train decoder separately then freeze it for encoder update.
+            # When decoder_steps = 0, we train them jointly in one step.
             if cfg.decoder_steps > 0:
                 decoder_loss_total = 0.0
                 for _ in range(cfg.decoder_steps):
@@ -196,7 +198,7 @@ def train(cfg: TrainingConfig):
                     for p in decoder.parameters():
                         p.requires_grad_(True)
             else:
-                dec_opt.zero_grad()
+                # Joint training mode
                 logits = decoder(X_att_log)
                 bit_loss = bit_loss_bce(logits, bits)
                 decoder_loss_val = bit_loss.item()

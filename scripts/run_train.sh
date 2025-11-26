@@ -28,15 +28,15 @@ source venv/bin/activate
 
 # Shared experiment configuration
 DATA_DIR="clips/"
-EPOCHS=1
+EPOCHS=10
 BATCH=32
 NUM_BITS=8
-EPS=0.15
+EPS=0.2
 ALPHA=0.0
 BETA=0.0
 MASK_REG=0.0
 LOGIT_REG=0.0
-DECODER_LR=1e-4
+DECODER_LR=3e-4
 DECODER_STEPS=0
 # MAX_STEPS=500
 
@@ -92,7 +92,8 @@ EOF
     --channel-mode "${channel_mode}" \
     --plot-path "${PLOT_PATH}" \
     --encoder-ckpt "${ENC_CKPT}" \
-    --decoder-ckpt "${DEC_CKPT}" | tee -a "${LOG_FILE}"
+    --decoder-ckpt "${DEC_CKPT}" \
+    --lr "${DECODER_LR}" | tee -a "${LOG_FILE}"
     # --max-steps-per-epoch "${MAX_STEPS}"
 }
 
