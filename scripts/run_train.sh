@@ -81,6 +81,7 @@ log-file        = ${LOG_FILE}
 ============================================================
 EOF
 
+  TMP_LOG=$(mktemp)
   python -m watermarking.train \
     --data-dir "${DATA_DIR}" \
     --epochs "${EPOCHS}" \
@@ -98,7 +99,9 @@ EOF
     --encoder-ckpt "${ENC_CKPT}" \
     --decoder-ckpt "${DEC_CKPT}" \
     --save-pt "${SAVE_PT}" \
-    --lr "${DECODER_LR}" | tee -a "${LOG_FILE}"
+    --lr "${DECODER_LR}" | tee "${TMP_LOG}"
+  cat "${TMP_LOG}" >> "${LOG_FILE}"
+  rm -f "${TMP_LOG}"
     # --max-steps-per-epoch "${MAX_STEPS}"
 }
 
