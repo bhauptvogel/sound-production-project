@@ -81,6 +81,7 @@ def train(cfg: TrainingConfig):
         root_dir=cfg.data_dir,
         clip_duration=cfg.clip_duration,
         target_sr=cfg.sample_rate,
+        split="train",
     )
     loader = DataLoader(
         dataset,
