@@ -6,3 +6,5 @@ watermarked.wav
 plots/
 checkpoints/
 results/
+__pycache__/
+watermarking/__pycache__/
