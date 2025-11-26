@@ -62,6 +62,7 @@ class TrainingConfig:
     plot_path: str | None = None
     encoder_ckpt: str | None = None
     decoder_ckpt: str | None = None
+    log_path: str | None = None
 
     # STFT
     n_fft: int = 1024
@@ -69,8 +70,8 @@ class TrainingConfig:
     win_length: int = 1024
 
     def __post_init__(self):
-        if self.decoder_steps < 1:
-            raise ValueError("decoder_steps must be >= 1")
+        if self.decoder_steps < 0:
+            raise ValueError("decoder_steps must be >= 0")
 
 
 def train(cfg: TrainingConfig):
@@ -174,27 +175,33 @@ def train(cfg: TrainingConfig):
             X_att = stft(y_attacked, stft_cfg)
             X_att_log = torch.log(X_att.abs() + 1e-7).unsqueeze(1)
 
-            # Decoder adaptation step(s)
-            decoder_loss_total = 0.0
-            for _ in range(cfg.decoder_steps):
+            # Decoder adaptation step(s) (optional)
+            if cfg.decoder_steps > 0:
+                decoder_loss_total = 0.0
+                for _ in range(cfg.decoder_steps):
+                    dec_opt.zero_grad()
+                    logits_dec = decoder(X_att_log.detach())
+                    decoder_loss = bit_loss_bce(logits_dec, bits)
+                    decoder_loss.backward()
+                    dec_opt.step()
+                    decoder_loss_total += decoder_loss.item()
+
+                decoder_loss_val = decoder_loss_total / cfg.decoder_steps
+
+                for p in decoder.parameters():
+                    p.requires_grad_(False)
+
+                try:
+                    logits = decoder(X_att_log)
+                    bit_loss = bit_loss_bce(logits, bits)
+                finally:
+                    for p in decoder.parameters():
+                        p.requires_grad_(True)
+            else:
                 dec_opt.zero_grad()
-                logits_dec = decoder(X_att_log.detach())
-                decoder_loss = bit_loss_bce(logits_dec, bits)
-                decoder_loss.backward()
-                dec_opt.step()
-                decoder_loss_total += decoder_loss.item()
-
-            decoder_loss_val = decoder_loss_total / cfg.decoder_steps
-
-            for p in decoder.parameters():
-                p.requires_grad_(False)
-
-            try:
                 logits = decoder(X_att_log)
                 bit_loss = bit_loss_bce(logits, bits)
-            finally:
-                for p in decoder.parameters():
-                    p.requires_grad_(True)
+                decoder_loss_val = bit_loss.item()
 
             # Debugging: print statistics every 100 steps
             if step % 100 == 0:
@@ -245,9 +252,16 @@ def train(cfg: TrainingConfig):
                 + logit_penalty
             )
 
-            enc_opt.zero_grad()
-            loss.backward()
-            enc_opt.step()
+            if cfg.decoder_steps > 0:
+                enc_opt.zero_grad()
+                loss.backward()
+                enc_opt.step()
+            else:
+                enc_opt.zero_grad()
+                dec_opt.zero_grad()
+                loss.backward()
+                enc_opt.step()
+                dec_opt.step()
 
             with torch.no_grad():
                 probs = torch.sigmoid(logits)
@@ -276,7 +290,7 @@ def train(cfg: TrainingConfig):
             )
 
             if step % 50 == 0:
-                print(
+                debug_msg = (
                     f"[Debug step {step}] "
                     f"bit_loss={bit_loss.item():.4f} "
                     f"decoder_loss={decoder_loss_val:.4f} "
@@ -284,9 +298,14 @@ def train(cfg: TrainingConfig):
                     f"mask_std={float(M.std().item()):.4f} "
                     f"logit_std={float(logits.std().item()):.4f}"
                 )
+                print(debug_msg)
+                if cfg.log_path:
+                    Path(cfg.log_path).parent.mkdir(parents=True, exist_ok=True)
+                    with open(cfg.log_path, "a", encoding="utf-8") as log_file:
+                        log_file.write(debug_msg + "\n")
 
         n = step
-        print(
+        epoch_msg = (
             f"[Epoch {epoch}] "
             f"Enc {running_enc_loss/n:.4f} | "
             f"Dec {running_dec_loss/n:.4f} | "
@@ -296,6 +315,10 @@ def train(cfg: TrainingConfig):
             f"BER {running_ber/n:.4f} | "
             f"SNR {running_snr/n:.2f} dB"
         )
+        print(epoch_msg)
+        if cfg.log_path:
+            with open(cfg.log_path, "a", encoding="utf-8") as log_file:
+                log_file.write(epoch_msg + "\n")
 
         # TODO: save encoder/decoder checkpoints here if you want
 
@@ -383,6 +406,8 @@ def parse_args() -> TrainingConfig:
                     help="Path to save encoder checkpoint")
     ap.add_argument("--decoder-ckpt", type=str, default=None,
                     help="Path to save decoder checkpoint")
+    ap.add_argument("--log-path", type=str, default=None,
+                    help="Append training logs to this file")
     args = ap.parse_args()
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -406,6 +431,7 @@ def parse_args() -> TrainingConfig:
         plot_path=args.plot_path,
         encoder_ckpt=args.encoder_ckpt,
         decoder_ckpt=args.decoder_ckpt,
+        log_path=args.log_path,
     )
 
 

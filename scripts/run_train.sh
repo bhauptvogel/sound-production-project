@@ -29,32 +29,33 @@ source venv/bin/activate
 
 # Shared experiment configuration
 DATA_DIR="clips/"
-EPOCHS=5
+EPOCHS=1
 BATCH=32
-NUM_BITS=16
-EPS=0.025
-ALPHA=0.01
-BETA=0.01
-MASK_REG=0.05
-LOGIT_REG=0.001
-DECODER_LR=5e-5
-DECODER_STEPS=2
+NUM_BITS=8
+EPS=0.15
+ALPHA=0.0
+BETA=0.0
+MASK_REG=0.0
+LOGIT_REG=0.0
+DECODER_LR=1e-4
+DECODER_STEPS=0
 # MAX_STEPS=500
 
 run_stage() {
   local channel_mode="$1"
 
-  mkdir -p checkpoints plots
+  mkdir -p checkpoints plots results
   RUN_TAG=$(printf "eps%s_mask%s_decLR%s_ch%s" "${EPS}" "${MASK_REG}" "${DECODER_LR}" "${channel_mode}")
   TIMESTAMP=$(date +%Y%m%d-%H%M%S)
   RUN_NAME="${RUN_TAG}_${TIMESTAMP}"
   PLOT_PATH="plots/${RUN_NAME}.png"
   ENC_CKPT="checkpoints/${RUN_NAME}_encoder.pt"
   DEC_CKPT="checkpoints/${RUN_NAME}_decoder.pt"
+  LOG_FILE="results/${RUN_NAME}.txt"
 
   cat <<EOF
 ============================================================
-Stage Configuration
+Configuration
 ------------------------------------------------------------
 run-name        = ${RUN_NAME}
 data-dir        = ${DATA_DIR}
@@ -73,6 +74,7 @@ max-steps-epoch = ${MAX_STEPS:-None}
 plot-path       = ${PLOT_PATH}
 enc-checkpoint  = ${ENC_CKPT}
 dec-checkpoint  = ${DEC_CKPT}
+log-file        = ${LOG_FILE}
 ============================================================
 EOF
 
@@ -91,7 +93,8 @@ EOF
     --channel-mode "${channel_mode}" \
     --plot-path "${PLOT_PATH}" \
     --encoder-ckpt "${ENC_CKPT}" \
-    --decoder-ckpt "${DEC_CKPT}"
+    --decoder-ckpt "${DEC_CKPT}" \
+    --log-path "${LOG_FILE}"
     # --max-steps-per-epoch "${MAX_STEPS}"
 }
 
