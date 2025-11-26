@@ -206,43 +206,6 @@ def train(cfg: TrainingConfig):
                 bit_loss = bit_loss_bce(logits, bits)
                 decoder_loss_val = bit_loss.item()
 
-            # Debugging: print statistics every 100 steps
-            if step % 100 == 0:
-                with torch.no_grad():
-                    mask_stats = {
-                        'mask_mean': M.mean().item(),
-                        'mask_std': M.std().item(),
-                        'mask_max': M.max().item(),
-                        'mask_min': M.min().item(),
-                        'tanh_mask_mean': torch.tanh(M).mean().item(),
-                        'tanh_mask_std': torch.tanh(M).std().item(),
-                    }
-                    logit_stats = {
-                        'logit_mean': logits.mean().item(),
-                        'logit_std': logits.std().item(),
-                        'logit_max': logits.max().item(),
-                        'logit_min': logits.min().item(),
-                    }
-                    # Check if encoder produces different masks for different bits
-                    # (sample two different bit patterns and compare masks)
-                    if step == 100:
-                        bits1 = torch.zeros(1, cfg.n_bits, device=device)
-                        bits2 = torch.ones(1, cfg.n_bits, device=device)
-                        M1 = encoder(logmag_in[:1], bits1)
-                        M2 = encoder(logmag_in[:1], bits2)
-                        mask_diff = (M1 - M2).abs().mean().item()
-                        
-                        # Also check if bit embedding itself is different
-                        with torch.no_grad():
-                            bit_emb1 = encoder.bit_mlp(bits1)
-                            bit_emb2 = encoder.bit_mlp(bits2)
-                            bit_emb_diff = (bit_emb1 - bit_emb2).abs().mean().item()
-                        
-                        print(f"\n[Debug step {step}] Bit embedding difference (all-0 vs all-1): {bit_emb_diff:.6f}")
-                        print(f"[Debug step {step}] Mask difference (all-0 vs all-1 bits): {mask_diff:.6f}")
-                        print(f"[Debug step {step}] Mask stats: {mask_stats}")
-                        print(f"[Debug step {step}] Logit stats: {logit_stats}")
-                        
             audio_l2 = torch.mean((y_attacked - x) ** 2)
             lsd = log_spectral_distance_weighted(x, y_attacked, spec_cfg)
             mask_penalty = cfg.mask_reg * torch.mean(torch.tanh(M) ** 2)  # keeps perturbations bounded
@@ -293,14 +256,7 @@ def train(cfg: TrainingConfig):
             )
 
             if step % 50 == 0:
-                print(
-                    f"[Debug step {step}] "
-                    f"bit_loss={bit_loss.item():.4f} "
-                    f"decoder_loss={decoder_loss_val:.4f} "
-                    f"ber={ber:.3f} "
-                    f"mask_std={float(M.std().item()):.4f} "
-                    f"logit_std={float(logits.std().item()):.4f}"
-                )
+                pass # Debugging prints removed
 
         n = step
         print(

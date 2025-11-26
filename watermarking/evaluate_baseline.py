@@ -4,7 +4,6 @@
 
 import argparse
 import math
-import random
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -16,6 +15,8 @@ from tqdm import tqdm
 from watermarking.data import load_audio, save_audio
 from watermarking.baseline import BaselineConfig, embed_baseline, extract_baseline
 from watermarking.dataset import RandomClipDataset
+
+DEFAULT_CLIP_DURATION = 2.0  # seconds
 
 
 def snr_db(x: torch.Tensor, y: torch.Tensor) -> float:
@@ -102,21 +103,9 @@ def main():
         help="Path to save the alpha sweep plot",
     )
     ap.add_argument(
-        "--num-clips",
-        type=int,
-        default=100,
-        help="Number of random dataset clips to evaluate (>=1)",
-    )
-    ap.add_argument(
         "--dataset-dir",
         default=None,
-        help="Directory with audio files for multi-clip evaluation (defaults to 'clips')",
-    )
-    ap.add_argument(
-        "--clip-duration",
-        type=float,
-        default=2.0,
-        help="Clip duration in seconds when sampling from dataset",
+        help="Directory with audio files; evaluates full validation split if provided",
     )
     args = ap.parse_args()
 
@@ -124,20 +113,21 @@ def main():
     is_sweep = args.alpha_values is not None
     results = []
 
-    use_dataset = args.num_clips > 1
-    if args.num_clips < 1:
-        raise ValueError("--num-clips must be >= 1")
+    use_dataset = args.dataset_dir is not None
+    if not use_dataset and not args.inp:
+        raise ValueError("--in is required when --dataset-dir is not provided.")
 
     if use_dataset:
-        dataset_dir = Path(args.dataset_dir) if args.dataset_dir else Path("clips")
+        dataset_dir = Path(args.dataset_dir)
         if not dataset_dir.exists():
             raise FileNotFoundError(
                 f"Dataset directory {dataset_dir} does not exist."
             )
         dataset = RandomClipDataset(
             root_dir=dataset_dir,
-            clip_duration=args.clip_duration,
+            clip_duration=DEFAULT_CLIP_DURATION,
             target_sr=44_100,
+            split="val",
         )
         aggregated = {
             alpha: {
@@ -150,9 +140,8 @@ def main():
             for alpha in alpha_values
         }
 
-        clip_iter = tqdm(range(args.num_clips), desc="Evaluating clips")
-        for clip_idx in clip_iter:
-            idx = random.randint(0, len(dataset) - 1)
+        clip_iter = tqdm(range(len(dataset)), desc="Evaluating val clips")
+        for idx in clip_iter:
             wav = dataset[idx].unsqueeze(0)  # (1, T)
             bits = torch.randint(0, 2, (args.bits,), dtype=torch.int64)
 
