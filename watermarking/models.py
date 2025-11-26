@@ -1,6 +1,6 @@
 # watermarking/models.py
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Tuple
 
 import torch
@@ -16,14 +16,14 @@ class EncoderConfig:
     n_bits: int
     bit_emb_dim: int = 32
     base_channels: int = 64
-    stft_cfg: STFTConfig = STFTConfig()
+    stft_cfg: STFTConfig = field(default_factory=STFTConfig)
 
 
 @dataclass
 class DecoderConfig:
     n_bits: int
     base_channels: int = 64
-    stft_cfg: STFTConfig = STFTConfig()
+    stft_cfg: STFTConfig = field(default_factory=STFTConfig)
 
 
 def _bit_bin_pairs(cfg: EncoderConfig | DecoderConfig) -> Tuple[torch.Tensor, torch.Tensor]:
