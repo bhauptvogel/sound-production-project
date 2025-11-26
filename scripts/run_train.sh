@@ -26,50 +26,51 @@ cd /workspace/project && source venv/bin/activate
 # ============================================================================
 
 # Stage 0 experiment: longer run on identity channel with stronger regularization
+STAGE0_DATA_DIR="clips/"
+STAGE0_EPOCHS=5
+STAGE0_BATCH=4
+STAGE0_BITS=16
+STAGE0_EPS=0.025
+STAGE0_ALPHA=0.01
+STAGE0_BETA=0.01
+STAGE0_MASK_REG=0.05
+STAGE0_LOGIT_REG=0.001
+STAGE0_DECODER_LR=5e-5
+STAGE0_DECODER_STEPS=2
+STAGE0_CHANNEL="none" # Stage 0: none, Stage 1: noise_only, Stage 3: full
+# STAGE0_MAX_STEPS=500
+
+cat <<EOF
+============================================================
+Stage 0 Configuration
+------------------------------------------------------------
+data-dir        = ${STAGE0_DATA_DIR}
+epochs          = ${STAGE0_EPOCHS}
+batch-size      = ${STAGE0_BATCH}
+n-bits          = ${STAGE0_BITS}
+eps             = ${STAGE0_EPS}
+alpha-l2        = ${STAGE0_ALPHA}
+beta-lsd        = ${STAGE0_BETA}
+mask-reg        = ${STAGE0_MASK_REG}
+logit-reg       = ${STAGE0_LOGIT_REG}
+decoder-lr      = ${STAGE0_DECODER_LR}
+decoder-steps   = ${STAGE0_DECODER_STEPS}
+channel-mode    = ${STAGE0_CHANNEL}
+max-steps-epoch = ${STAGE0_MAX_STEPS:-None}
+============================================================
+EOF
+
 python -m watermarking.train \
-  --data-dir clips/ \
-  --epochs 5 \
-  --batch-size 4 \
-  --n-bits 16 \
-  --eps 0.025 \
-  --alpha-l2 0.01 \
-  --beta-lsd 0.01 \
-  --mask-reg 0.05 \
-  --logit-reg 0.001 \
-  --decoder-lr 5e-5 \
-  --decoder-steps 2 \
-  --channel-mode none
-  # --max-steps-per-epoch 500
-
-# Stage 1 experiment: mild noise channel after decoder stabilizes
-# python -m watermarking.train \
-#   --data-dir clips/ \
-#   --epochs 2 \
-#   --batch-size 4 \
-#   --n-bits 16 \
-#   --eps 0.02 \
-#   --alpha-l2 0.02 \
-#   --beta-lsd 0.02 \
-#   --mask-reg 0.05 \
-#   --logit-reg 0.001 \
-#   --decoder-lr 5e-5 \
-#   --decoder-steps 2 \
-#   --channel-mode noise_only \
-#   --max-steps-per-epoch 500
-
-# Uncomment below to try Stage 3 (full channel):
-# python -m watermarking.train \
-#   --data-dir clips/ \
-#   --epochs 5 \
-#   --batch-size 4 \
-#   --n-bits 16 \
-#   --eps 0.015 \
-#   --alpha-l2 0.05 \
-#   --beta-lsd 0.05 \
-#   --mask-reg 0.05 \
-#   --logit-reg 0.002 \
-#   --decoder-lr 5e-5 \
-#   --decoder-steps 2 \
-#   --channel-mode full \
-#   --max-steps-per-epoch 1000
-
+  --data-dir "${STAGE0_DATA_DIR}" \
+  --epochs "${STAGE0_EPOCHS}" \
+  --batch-size "${STAGE0_BATCH}" \
+  --n-bits "${STAGE0_BITS}" \
+  --eps "${STAGE0_EPS}" \
+  --alpha-l2 "${STAGE0_ALPHA}" \
+  --beta-lsd "${STAGE0_BETA}" \
+  --mask-reg "${STAGE0_MASK_REG}" \
+  --logit-reg "${STAGE0_LOGIT_REG}" \
+  --decoder-lr "${STAGE0_DECODER_LR}" \
+  --decoder-steps "${STAGE0_DECODER_STEPS}" \
+  --channel-mode "${STAGE0_CHANNEL}"
+  # --max-steps-per-epoch "${STAGE0_MAX_STEPS}"
