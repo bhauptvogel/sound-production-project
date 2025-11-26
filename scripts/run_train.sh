@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # cd /home/bmainbird/UL/sound-production/project && source venv/bin/activate
-git pull
 cd /workspace/project
 source venv/bin/activate
 
@@ -47,7 +46,7 @@ run_stage() {
   mkdir -p checkpoints plots results
   RUN_TAG=$(printf "eps%s_mask%s_decLR%s_ch%s" "${EPS}" "${MASK_REG}" "${DECODER_LR}" "${channel_mode}")
   TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-  RUN_NAME="${RUN_TAG}_${TIMESTAMP}"
+  RUN_NAME="${TIMESTAMP}_${RUN_TAG}"
   PLOT_PATH="plots/${RUN_NAME}.png"
   ENC_CKPT="checkpoints/${RUN_NAME}_encoder.pt"
   DEC_CKPT="checkpoints/${RUN_NAME}_decoder.pt"

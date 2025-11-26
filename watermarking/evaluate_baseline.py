@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 from tqdm import tqdm
 
@@ -271,8 +272,9 @@ def main():
 
     ax_snr.set_xlabel("alpha")
     ax_snr.set_ylabel("SNR (dB)", color="tab:blue")
-    ax_ber.set_ylabel("BER (lower is better)", color="tab:red")
+    ax_ber.set_ylabel("BER", color="tab:red")
     ax_ber.invert_yaxis()
+    ax_snr.set_xticks(np.arange(0.0, 1.01, 0.5))
     ax_snr.grid(True, alpha=0.3)
     fig.tight_layout()
 
