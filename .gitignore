@@ -3,3 +3,5 @@ audio.wav
 clips/
 venv/
 watermarked.wav
+plots/
+checkpoints/

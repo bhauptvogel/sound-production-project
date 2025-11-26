@@ -28,7 +28,7 @@ cd /workspace/project && source venv/bin/activate
 # Stage 0 experiment: longer run on identity channel with stronger regularization
 STAGE0_DATA_DIR="clips/"
 STAGE0_EPOCHS=5
-STAGE0_BATCH=4
+STAGE0_BATCH=32
 STAGE0_BITS=16
 STAGE0_EPS=0.025
 STAGE0_ALPHA=0.01
@@ -40,10 +40,19 @@ STAGE0_DECODER_STEPS=2
 STAGE0_CHANNEL="none" # Stage 0: none, Stage 1: noise_only, Stage 3: full
 # STAGE0_MAX_STEPS=500
 
+mkdir -p checkpoints plots
+RUN_TAG=$(printf "eps%s_mask%s_decLR%s_ch%s" "${STAGE0_EPS}" "${STAGE0_MASK_REG}" "${STAGE0_DECODER_LR}" "${STAGE0_CHANNEL}")
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+RUN_NAME="${RUN_TAG}_${TIMESTAMP}"
+PLOT_PATH="plots/${RUN_NAME}.png"
+ENC_CKPT="checkpoints/${RUN_NAME}_encoder.pt"
+DEC_CKPT="checkpoints/${RUN_NAME}_decoder.pt"
+
 cat <<EOF
 ============================================================
 Stage 0 Configuration
 ------------------------------------------------------------
+run-name        = ${RUN_NAME}
 data-dir        = ${STAGE0_DATA_DIR}
 epochs          = ${STAGE0_EPOCHS}
 batch-size      = ${STAGE0_BATCH}
@@ -57,6 +66,9 @@ decoder-lr      = ${STAGE0_DECODER_LR}
 decoder-steps   = ${STAGE0_DECODER_STEPS}
 channel-mode    = ${STAGE0_CHANNEL}
 max-steps-epoch = ${STAGE0_MAX_STEPS:-None}
+plot-path       = ${PLOT_PATH}
+enc-checkpoint  = ${ENC_CKPT}
+dec-checkpoint  = ${DEC_CKPT}
 ============================================================
 EOF
 
@@ -72,5 +84,8 @@ python -m watermarking.train \
   --logit-reg "${STAGE0_LOGIT_REG}" \
   --decoder-lr "${STAGE0_DECODER_LR}" \
   --decoder-steps "${STAGE0_DECODER_STEPS}" \
-  --channel-mode "${STAGE0_CHANNEL}"
+  --channel-mode "${STAGE0_CHANNEL}" \
+  --plot-path "${PLOT_PATH}" \
+  --encoder-ckpt "${ENC_CKPT}" \
+  --decoder-ckpt "${DEC_CKPT}"
   # --max-steps-per-epoch "${STAGE0_MAX_STEPS}"

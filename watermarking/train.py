@@ -6,7 +6,11 @@ import argparse
 from dataclasses import dataclass
 from tqdm.auto import tqdm
 
+from pathlib import Path
 import torch
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 
 from watermarking.stft_utils import STFTConfig
@@ -55,6 +59,9 @@ class TrainingConfig:
     mask_reg: float = 0.0
     decoder_lr: float = 1e-4
     logit_reg: float = 0.0
+    plot_path: str | None = None
+    encoder_ckpt: str | None = None
+    decoder_ckpt: str | None = None
 
     # STFT
     n_fft: int = 1024
@@ -122,6 +129,7 @@ def train(cfg: TrainingConfig):
     dec_opt = torch.optim.Adam(decoder.parameters(), lr=cfg.decoder_lr)
 
     print(f"Training on {cfg.device} with {len(dataset)} virtual samples.")
+    epoch_metrics: list[dict[str, float]] = []
 
     for epoch in range(1, cfg.num_epochs + 1):
         encoder.train()
@@ -267,6 +275,16 @@ def train(cfg: TrainingConfig):
                 snr=f"{running_snr / n:.1f}dB",
             )
 
+            if step % 50 == 0:
+                print(
+                    f"[Debug step {step}] "
+                    f"bit_loss={bit_loss.item():.4f} "
+                    f"decoder_loss={decoder_loss_val:.4f} "
+                    f"ber={ber:.3f} "
+                    f"mask_std={float(M.std().item()):.4f} "
+                    f"logit_std={float(logits.std().item()):.4f}"
+                )
+
         n = step
         print(
             f"[Epoch {epoch}] "
@@ -280,6 +298,59 @@ def train(cfg: TrainingConfig):
         )
 
         # TODO: save encoder/decoder checkpoints here if you want
+
+        epoch_metrics.append(
+            {
+                "epoch": epoch,
+                "enc_loss": running_enc_loss / n,
+                "dec_loss": running_dec_loss / n,
+                "bit_loss": running_bit_loss / n,
+                "l2": running_l2 / n,
+                "lsd": running_lsd / n,
+                "ber": running_ber / n,
+                "snr": running_snr / n,
+            }
+        )
+
+    if epoch_metrics:
+        epochs = [m["epoch"] for m in epoch_metrics]
+        fig, axs = plt.subplots(3, 1, figsize=(8, 10), sharex=True)
+
+        axs[0].plot(epochs, [m["bit_loss"] for m in epoch_metrics], label="Bit loss")
+        axs[0].plot(epochs, [m["enc_loss"] for m in epoch_metrics], label="Encoder loss")
+        axs[0].plot(epochs, [m["dec_loss"] for m in epoch_metrics], label="Decoder loss")
+        axs[0].set_ylabel("Loss")
+        axs[0].legend()
+        axs[0].grid(True, alpha=0.3)
+
+        axs[1].plot(epochs, [m["ber"] for m in epoch_metrics], marker="o")
+        axs[1].set_ylabel("BER")
+        axs[1].grid(True, alpha=0.3)
+
+        axs[2].plot(epochs, [m["snr"] for m in epoch_metrics], marker="o", color="tab:green")
+        axs[2].set_xlabel("Epoch")
+        axs[2].set_ylabel("SNR (dB)")
+        axs[2].grid(True, alpha=0.3)
+
+        plt.suptitle("Training Metrics")
+        plt.tight_layout()
+        output_path = cfg.plot_path or "plots/training_metrics.png"
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(output_path, dpi=150)
+        plt.close(fig)
+        print(f"Saved training metrics plot to {output_path}")
+
+    if cfg.encoder_ckpt:
+        enc_path = Path(cfg.encoder_ckpt)
+        enc_path.parent.mkdir(parents=True, exist_ok=True)
+        torch.save(encoder.state_dict(), enc_path)
+        print(f"Saved encoder checkpoint to {enc_path}")
+
+    if cfg.decoder_ckpt:
+        dec_path = Path(cfg.decoder_ckpt)
+        dec_path.parent.mkdir(parents=True, exist_ok=True)
+        torch.save(decoder.state_dict(), dec_path)
+        print(f"Saved decoder checkpoint to {dec_path}")
 
 
 def parse_args() -> TrainingConfig:
@@ -306,6 +377,12 @@ def parse_args() -> TrainingConfig:
                     help="Learning rate for decoder optimizer")
     ap.add_argument("--logit-reg", type=float, default=0.0,
                     help="Weight for decoder logit L2 penalty")
+    ap.add_argument("--plot-path", type=str, default=None,
+                    help="Where to save the training metrics plot")
+    ap.add_argument("--encoder-ckpt", type=str, default=None,
+                    help="Path to save encoder checkpoint")
+    ap.add_argument("--decoder-ckpt", type=str, default=None,
+                    help="Path to save decoder checkpoint")
     args = ap.parse_args()
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -326,6 +403,9 @@ def parse_args() -> TrainingConfig:
         mask_reg=args.mask_reg,
         decoder_lr=args.decoder_lr,
         logit_reg=args.logit_reg,
+        plot_path=args.plot_path,
+        encoder_ckpt=args.encoder_ckpt,
+        decoder_ckpt=args.decoder_ckpt,
     )
 
 
