@@ -38,7 +38,7 @@ MASK_REG=0.0
 LOGIT_REG=0.0
 DECODER_LR=3e-4
 DECODER_STEPS=0
-SAVE_PT=0 # 1 = save checkpoints, 0 = don't save
+SAVE_PT=1 # 1 = save checkpoints, 0 = don't save
 # MAX_STEPS=500
 
 run_stage() {
