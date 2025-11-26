@@ -79,7 +79,7 @@ def main():
     ap = argparse.ArgumentParser(description="Evaluate baseline watermark (SNR + BER)")
     ap.add_argument("--in", dest="inp", help="Input clean WAV (single-file mode)")
     ap.add_argument("--out", dest="out", default="watermarked.wav")
-    ap.add_argument("--bits", type=int, default=32, help="Number of bits to embed")
+    ap.add_argument("--bits", type=int, default=16, help="Number of bits to embed")
     ap.add_argument("--alpha", type=float, default=0.1, help="Embedding strength")
     ap.add_argument("--low-bin", type=int, default=40)
     ap.add_argument("--high-bin", type=int, default=200)
