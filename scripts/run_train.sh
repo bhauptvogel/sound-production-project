@@ -28,7 +28,7 @@ source venv/bin/activate
 
 # Shared experiment configuration
 DATA_DIR="clips/"
-EPOCHS=10
+EPOCHS=1
 BATCH=64
 NUM_BITS=8
 EPS=0.2
@@ -45,7 +45,9 @@ run_stage() {
   local channel_mode="$1"
 
   mkdir -p checkpoints plots results
-  RUN_TAG=$(printf "eps%s_mask%s_decLR%s_ch%s" "${EPS}" "${MASK_REG}" "${DECODER_LR}" "${channel_mode}")
+  RUN_TAG=$(printf "bits%s_eps%s_alpha%s_beta%s_mask%s_logit%s_decLR%s_decSteps%s_bs%s_ep%s_ch%s" \
+    "${NUM_BITS}" "${EPS}" "${ALPHA}" "${BETA}" "${MASK_REG}" "${LOGIT_REG}" \
+    "${DECODER_LR}" "${DECODER_STEPS}" "${BATCH}" "${EPOCHS}" "${channel_mode}")
   TIMESTAMP=$(date +%Y%m%d-%H%M%S)
   RUN_NAME="${TIMESTAMP}_${RUN_TAG}"
   PLOT_PATH="plots/${RUN_NAME}.png"
