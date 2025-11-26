@@ -27,67 +27,73 @@ source venv/bin/activate
 #   - Expected: Model learns to survive realistic distortions
 # ============================================================================
 
-# Stage 0 experiment: longer run on identity channel with stronger regularization
-STAGE0_DATA_DIR="clips/"
-STAGE0_EPOCHS=5
-STAGE0_BATCH=32
-STAGE0_BITS=16
-STAGE0_EPS=0.025
-STAGE0_ALPHA=0.01
-STAGE0_BETA=0.01
-STAGE0_MASK_REG=0.05
-STAGE0_LOGIT_REG=0.001
-STAGE0_DECODER_LR=5e-5
-STAGE0_DECODER_STEPS=2
-STAGE0_CHANNEL="none" # Stage 0: none, Stage 1: noise_only, Stage 3: full
-# STAGE0_MAX_STEPS=500
+# Shared experiment configuration
+DATA_DIR="clips/"
+EPOCHS=5
+BATCH=32
+NUM_BITS=16
+EPS=0.025
+ALPHA=0.01
+BETA=0.01
+MASK_REG=0.05
+LOGIT_REG=0.001
+DECODER_LR=5e-5
+DECODER_STEPS=2
+# MAX_STEPS=500
 
-mkdir -p checkpoints plots
-RUN_TAG=$(printf "eps%s_mask%s_decLR%s_ch%s" "${STAGE0_EPS}" "${STAGE0_MASK_REG}" "${STAGE0_DECODER_LR}" "${STAGE0_CHANNEL}")
-TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-RUN_NAME="${RUN_TAG}_${TIMESTAMP}"
-PLOT_PATH="plots/${RUN_NAME}.png"
-ENC_CKPT="checkpoints/${RUN_NAME}_encoder.pt"
-DEC_CKPT="checkpoints/${RUN_NAME}_decoder.pt"
+run_stage() {
+  local channel_mode="$1"
 
-cat <<EOF
+  mkdir -p checkpoints plots
+  RUN_TAG=$(printf "eps%s_mask%s_decLR%s_ch%s" "${EPS}" "${MASK_REG}" "${DECODER_LR}" "${channel_mode}")
+  TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+  RUN_NAME="${RUN_TAG}_${TIMESTAMP}"
+  PLOT_PATH="plots/${RUN_NAME}.png"
+  ENC_CKPT="checkpoints/${RUN_NAME}_encoder.pt"
+  DEC_CKPT="checkpoints/${RUN_NAME}_decoder.pt"
+
+  cat <<EOF
 ============================================================
-Stage 0 Configuration
+Stage Configuration
 ------------------------------------------------------------
 run-name        = ${RUN_NAME}
-data-dir        = ${STAGE0_DATA_DIR}
-epochs          = ${STAGE0_EPOCHS}
-batch-size      = ${STAGE0_BATCH}
-n-bits          = ${STAGE0_BITS}
-eps             = ${STAGE0_EPS}
-alpha-l2        = ${STAGE0_ALPHA}
-beta-lsd        = ${STAGE0_BETA}
-mask-reg        = ${STAGE0_MASK_REG}
-logit-reg       = ${STAGE0_LOGIT_REG}
-decoder-lr      = ${STAGE0_DECODER_LR}
-decoder-steps   = ${STAGE0_DECODER_STEPS}
-channel-mode    = ${STAGE0_CHANNEL}
-max-steps-epoch = ${STAGE0_MAX_STEPS:-None}
+data-dir        = ${DATA_DIR}
+epochs          = ${EPOCHS}
+batch-size      = ${BATCH}
+n-bits          = ${NUM_BITS}
+eps             = ${EPS}
+alpha-l2        = ${ALPHA}
+beta-lsd        = ${BETA}
+mask-reg        = ${MASK_REG}
+logit-reg       = ${LOGIT_REG}
+decoder-lr      = ${DECODER_LR}
+decoder-steps   = ${DECODER_STEPS}
+channel-mode    = ${channel_mode}
+max-steps-epoch = ${MAX_STEPS:-None}
 plot-path       = ${PLOT_PATH}
 enc-checkpoint  = ${ENC_CKPT}
 dec-checkpoint  = ${DEC_CKPT}
 ============================================================
 EOF
 
-python -m watermarking.train \
-  --data-dir "${STAGE0_DATA_DIR}" \
-  --epochs "${STAGE0_EPOCHS}" \
-  --batch-size "${STAGE0_BATCH}" \
-  --n-bits "${STAGE0_BITS}" \
-  --eps "${STAGE0_EPS}" \
-  --alpha-l2 "${STAGE0_ALPHA}" \
-  --beta-lsd "${STAGE0_BETA}" \
-  --mask-reg "${STAGE0_MASK_REG}" \
-  --logit-reg "${STAGE0_LOGIT_REG}" \
-  --decoder-lr "${STAGE0_DECODER_LR}" \
-  --decoder-steps "${STAGE0_DECODER_STEPS}" \
-  --channel-mode "${STAGE0_CHANNEL}" \
-  --plot-path "${PLOT_PATH}" \
-  --encoder-ckpt "${ENC_CKPT}" \
-  --decoder-ckpt "${DEC_CKPT}"
-  # --max-steps-per-epoch "${STAGE0_MAX_STEPS}"
+  python -m watermarking.train \
+    --data-dir "${DATA_DIR}" \
+    --epochs "${EPOCHS}" \
+    --batch-size "${BATCH}" \
+    --n-bits "${NUM_BITS}" \
+    --eps "${EPS}" \
+    --alpha-l2 "${ALPHA}" \
+    --beta-lsd "${BETA}" \
+    --mask-reg "${MASK_REG}" \
+    --logit-reg "${LOGIT_REG}" \
+    --decoder-lr "${DECODER_LR}" \
+    --decoder-steps "${DECODER_STEPS}" \
+    --channel-mode "${channel_mode}" \
+    --plot-path "${PLOT_PATH}" \
+    --encoder-ckpt "${ENC_CKPT}" \
+    --decoder-ckpt "${DEC_CKPT}"
+    # --max-steps-per-epoch "${MAX_STEPS}"
+}
+
+# Run Stage 0 (identity channel). For Stage 1/3, call run_stage with noise_only/full.
+run_stage "none"
