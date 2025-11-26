@@ -194,14 +194,19 @@ def run_eval(args):
             target_sr=args.sample_rate,
             split=args.split,
         )
-        print(f"Evaluating on {args.num_clips} clips sampled from {len(dataset)} files in {dataset_dir} (split={args.split})")
+        # Use full dataset length unless num_clips is explicitly smaller
+        dataset_len = len(dataset)
+        if args.num_clips is not None and args.num_clips > 0 and args.num_clips < dataset_len:
+            num_iters = args.num_clips
+            print(f"Evaluating on {num_iters} clips (subset of {dataset_len} in '{args.split}' split)")
+        else:
+            num_iters = dataset_len
+            print(f"Evaluating on {num_iters} clips (full '{args.split}' split) from {dataset_dir}")
+
     elif args.input_file:
-        # Single file mode handled by creating a dummy list
+        # Single file mode
         print(f"Evaluating on single file: {args.input_file}")
-        # Load once to check validity
-        _x, _sr = load_audio(args.input_file, target_sr=args.sample_rate, mono=True)
-        # We will handle single file logic inside the loop by just repeating it or processing once
-        # But to unify logic, we can just load it in the loop.
+        num_iters = 1
     else:
         raise ValueError("Must provide either --eval-dir or --input-file")
 
@@ -222,8 +227,6 @@ def run_eval(args):
     # 3. Resampling
     if args.test_resample:
         # 0.9x speed
-        # We reuse random_resample from channel.py but with fixed rate for consistent eval?
-        # Or use the channel wrapper. Let's use channel logic but specific.
         from watermarking.channel import random_resample
         attacks.append(("Resample (0.9x)", lambda w: random_resample(w, 0.9, 0.9)))
         attacks.append(("Resample (1.1x)", lambda w: random_resample(w, 1.1, 1.1)))
@@ -244,26 +247,16 @@ def run_eval(args):
     
     # 7. EQ
     if args.test_eq:
-        # EQ is random in channel.py, let's define a fixed Low-Pass or High-Pass for determinstic eval?
-        # Or just use the random one from channel config. 
-        # Let's stick to the random EQ from channel config but with seed controlled if possible, 
-        # or just accept it's random. 
-        # For a "comprehensive" eval, maybe we want specific fixed filters, but implementing them 
-        # from scratch might be too much. Let's use the random_eq_stft but maybe we can't easily fix it.
-        # We will skip specific deterministic EQ for now and rely on the randomized one averaged over clips.
         from watermarking.channel import random_eq_stft
-        # Create a config just for EQ
         eq_cfg = ChannelConfig(stft_cfg=stft_cfg, eq_num_bands=6, eq_gain_db_min=-6, eq_gain_db_max=6)
         attacks.append(("Random EQ", lambda w: random_eq_stft(w, eq_cfg)))
 
     # Aggregate results
-    # Structure: results[attack_name] = {ber_sum, snr_sum, count, lsd_sum}
     results_agg = {
         name: {"ber_sum": 0.0, "snr_sum": 0.0, "lsd_sum": 0.0, "count": 0}
         for name, _ in attacks
     }
 
-    # Results for single file output
     single_file_results = []
     
     # Setup listening samples directory
@@ -274,9 +267,6 @@ def run_eval(args):
         save_samples_dir.mkdir(parents=True, exist_ok=True)
         print(f"Saving {args.num_save_samples} pairs of audio samples to {save_samples_dir}")
 
-    # Loop
-    num_iters = args.num_clips if args.eval_dir else 1
-    
     # For single file, load it once
     if args.input_file:
         wav_in, _ = load_audio(args.input_file, target_sr=args.sample_rate, mono=True)
@@ -288,8 +278,8 @@ def run_eval(args):
 
     for i in pbar:
         if args.eval_dir:
-            idx = np.random.randint(len(dataset))
-            wav_in = dataset[idx].unsqueeze(0).to(device) # (1, T)
+            # If we are iterating sequentially
+            wav_in = dataset[i].unsqueeze(0).to(device) # (1, T)
         
         # Generate bits
         bits = torch.randint(0, 2, (1, args.n_bits), device=device).float()
@@ -340,7 +330,7 @@ def run_eval(args):
             
             agg = results_agg[atk_name]
             agg["ber_sum"] += ber
-            agg["snr_sum"] += snr_val # SNR is Clean vs Watermarked (encoding quality), usually constant across attacks
+            agg["snr_sum"] += snr_val 
             agg["lsd_sum"] += lsd_val
             agg["count"] += 1
             
@@ -401,7 +391,10 @@ def main():
     parser.add_argument("--eval-dir", type=str, default=None, help="Directory of clips to evaluate")
     parser.add_argument("--split", type=str, default="val", choices=["train", "val", "all"], help="Dataset split to use")
     parser.add_argument("--input-file", type=str, default=None, help="Single file to evaluate")
-    parser.add_argument("--num-clips", type=int, default=100, help="Number of clips to sample from dir")
+    
+    # Optional: limit number of clips evaluated (useful for debugging, default: evaluate all)
+    parser.add_argument("--num-clips", type=int, default=None, help="Limit number of clips to evaluate (default: all in split)")
+    
     parser.add_argument("--clip-duration", type=float, default=2.0, help="Clip duration (s)")
     parser.add_argument("--sample-rate", type=int, default=44100)
     parser.add_argument("--num-save-samples", type=int, default=5, help="Number of original/watermarked pairs to save for listening")

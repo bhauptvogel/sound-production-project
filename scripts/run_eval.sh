@@ -1,0 +1,43 @@
+#!/bin/bash
+set -e
+
+# Configuration
+DATA_DIR="clips"
+OUTPUT_DIR="results/eval_$(date +%Y%m%d_%H%M%S)"
+CHECKPOINT_DIR="checkpoints"  # Adjust if your checkpoints are elsewhere
+
+# Find latest checkpoints (or specify manually)
+# This assumes checkpoints are named like "encoder_epochX.pt"
+# You might need to adjust this logic depending on how you save/name them
+LATEST_ENC=$(ls -t ${CHECKPOINT_DIR}/encoder_*.pt 2>/dev/null | head -n1)
+LATEST_DEC=$(ls -t ${CHECKPOINT_DIR}/decoder_*.pt 2>/dev/null | head -n1)
+
+if [ -z "$LATEST_ENC" ] || [ -z "$LATEST_DEC" ]; then
+    echo "Error: Could not find encoder/decoder checkpoints in $CHECKPOINT_DIR"
+    echo "Please specify checkpoints manually or check the path."
+    exit 1
+fi
+
+echo "Using Encoder: $LATEST_ENC"
+echo "Using Decoder: $LATEST_DEC"
+echo "Output Directory: $OUTPUT_DIR"
+
+# Create output directory
+mkdir -p "$OUTPUT_DIR"
+
+# Run Evaluation
+# Using the virtual environment python
+venv/bin/python -m watermarking.eval \
+    --encoder-ckpt "$LATEST_ENC" \
+    --decoder-ckpt "$LATEST_DEC" \
+    --eval-dir "$DATA_DIR" \
+    --split "val" \
+    --n-bits 32 \
+    --eps 0.02 \
+    --test-all \
+    --num-save-samples 5 \
+    --output-dir "$OUTPUT_DIR" \
+    --output-json "$OUTPUT_DIR/metrics.json"
+
+echo "Evaluation complete! Results saved to $OUTPUT_DIR"
+
