@@ -92,8 +92,7 @@ EOF
     --channel-mode "${channel_mode}" \
     --plot-path "${PLOT_PATH}" \
     --encoder-ckpt "${ENC_CKPT}" \
-    --decoder-ckpt "${DEC_CKPT}" \
-    --log-path "${LOG_FILE}"
+    --decoder-ckpt "${DEC_CKPT}" | tee -a "${LOG_FILE}"
     # --max-steps-per-epoch "${MAX_STEPS}"
 }
 

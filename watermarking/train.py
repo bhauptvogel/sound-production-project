@@ -6,7 +6,6 @@ import argparse
 from dataclasses import dataclass
 from tqdm.auto import tqdm
 
-from pathlib import Path
 import torch
 import matplotlib
 matplotlib.use("Agg")
@@ -62,7 +61,6 @@ class TrainingConfig:
     plot_path: str | None = None
     encoder_ckpt: str | None = None
     decoder_ckpt: str | None = None
-    log_path: str | None = None
 
     # STFT
     n_fft: int = 1024
@@ -290,7 +288,7 @@ def train(cfg: TrainingConfig):
             )
 
             if step % 50 == 0:
-                debug_msg = (
+                print(
                     f"[Debug step {step}] "
                     f"bit_loss={bit_loss.item():.4f} "
                     f"decoder_loss={decoder_loss_val:.4f} "
@@ -298,14 +296,9 @@ def train(cfg: TrainingConfig):
                     f"mask_std={float(M.std().item()):.4f} "
                     f"logit_std={float(logits.std().item()):.4f}"
                 )
-                print(debug_msg)
-                if cfg.log_path:
-                    Path(cfg.log_path).parent.mkdir(parents=True, exist_ok=True)
-                    with open(cfg.log_path, "a", encoding="utf-8") as log_file:
-                        log_file.write(debug_msg + "\n")
 
         n = step
-        epoch_msg = (
+        print(
             f"[Epoch {epoch}] "
             f"Enc {running_enc_loss/n:.4f} | "
             f"Dec {running_dec_loss/n:.4f} | "
@@ -315,10 +308,6 @@ def train(cfg: TrainingConfig):
             f"BER {running_ber/n:.4f} | "
             f"SNR {running_snr/n:.2f} dB"
         )
-        print(epoch_msg)
-        if cfg.log_path:
-            with open(cfg.log_path, "a", encoding="utf-8") as log_file:
-                log_file.write(epoch_msg + "\n")
 
         # TODO: save encoder/decoder checkpoints here if you want
 
@@ -406,8 +395,6 @@ def parse_args() -> TrainingConfig:
                     help="Path to save encoder checkpoint")
     ap.add_argument("--decoder-ckpt", type=str, default=None,
                     help="Path to save decoder checkpoint")
-    ap.add_argument("--log-path", type=str, default=None,
-                    help="Append training logs to this file")
     args = ap.parse_args()
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -431,7 +418,6 @@ def parse_args() -> TrainingConfig:
         plot_path=args.plot_path,
         encoder_ckpt=args.encoder_ckpt,
         decoder_ckpt=args.decoder_ckpt,
-        log_path=args.log_path,
     )
 
 

@@ -5,3 +5,4 @@ venv/
 watermarked.wav
 plots/
 checkpoints/
+results/
