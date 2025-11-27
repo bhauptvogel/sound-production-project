@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $0 <ssh-port>"
+  exit 1
+fi
+
 REMOTE_USER="root"
 REMOTE_HOST="213.173.108.206"
-REMOTE_PORT="14216"
+REMOTE_PORT="$1"
 SSH_KEY="${HOME}/.ssh/id_ed25519"
 
 REMOTE_BASE="/workspace/sound-production-project"
