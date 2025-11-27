@@ -22,6 +22,27 @@ echo "Using Encoder: $LATEST_ENC"
 echo "Using Decoder: $LATEST_DEC"
 echo "Output Directory: $OUTPUT_DIR"
 
+# Extract parameters from filename if possible
+# Example filename: 20251126-234814_bits16_eps0.2_alpha0.0_beta0.0_mask0.0_logit0.0_decLR5e-4_decSteps0_bs32_ep10_chnone_encoder.pt
+# We try to extract "bits16" -> 16 and "eps0.2" -> 0.2
+
+# Default values
+N_BITS=32
+EPS=0.02
+
+# Attempt to parse bits
+if [[ $LATEST_ENC =~ bits([0-9]+) ]]; then
+    N_BITS=${BASH_REMATCH[1]}
+    echo "Detected n-bits from filename: $N_BITS"
+fi
+
+# Attempt to parse eps
+if [[ $LATEST_ENC =~ eps([0-9.]+) ]]; then
+    EPS=${BASH_REMATCH[1]}
+    echo "Detected eps from filename: $EPS"
+fi
+
+
 # Create output directory
 mkdir -p "$OUTPUT_DIR"
 
@@ -32,12 +53,11 @@ venv/bin/python -m watermarking.eval \
     --decoder-ckpt "$LATEST_DEC" \
     --eval-dir "$DATA_DIR" \
     --split "val" \
-    --n-bits 32 \
-    --eps 0.02 \
+    --n-bits "$N_BITS" \
+    --eps "$EPS" \
     --test-all \
     --num-save-samples 5 \
     --output-dir "$OUTPUT_DIR" \
     --output-json "$OUTPUT_DIR/metrics.json"
 
 echo "Evaluation complete! Results saved to $OUTPUT_DIR"
-
