@@ -9,8 +9,8 @@ CHECKPOINT_DIR="checkpoints"  # Adjust if your checkpoints are elsewhere
 # Find latest checkpoints (or specify manually)
 # This assumes checkpoints are named like "encoder_epochX.pt"
 # You might need to adjust this logic depending on how you save/name them
-LATEST_ENC=$(ls -t ${CHECKPOINT_DIR}/encoder_*.pt 2>/dev/null | head -n1)
-LATEST_DEC=$(ls -t ${CHECKPOINT_DIR}/decoder_*.pt 2>/dev/null | head -n1)
+LATEST_ENC=$(ls -t ${CHECKPOINT_DIR}/*_encoder.pt 2>/dev/null | head -n1)
+LATEST_DEC=$(ls -t ${CHECKPOINT_DIR}/*_decoder.pt 2>/dev/null | head -n1)
 
 if [ -z "$LATEST_ENC" ] || [ -z "$LATEST_DEC" ]; then
     echo "Error: Could not find encoder/decoder checkpoints in $CHECKPOINT_DIR"

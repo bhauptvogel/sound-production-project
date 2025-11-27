@@ -14,7 +14,7 @@ SSH_KEY="${HOME}/.ssh/id_ed25519"
 REMOTE_BASE="/workspace/sound-production-project"
 LOCAL_BASE="/home/bmainbird/UL/sound-production/project"
 
-mkdir -p "${LOCAL_BASE}/plots" "${LOCAL_BASE}/results"
+mkdir -p "${LOCAL_BASE}/plots" "${LOCAL_BASE}/results" "${LOCAL_BASE}/checkpoints"
 
 scp -i "${SSH_KEY}" -P "${REMOTE_PORT}" -r \
   "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_BASE}/plots/" \
@@ -22,4 +22,8 @@ scp -i "${SSH_KEY}" -P "${REMOTE_PORT}" -r \
 
 scp -i "${SSH_KEY}" -P "${REMOTE_PORT}" -r \
   "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_BASE}/results/" \
+  "${LOCAL_BASE}"
+
+scp -i "${SSH_KEY}" -P "${REMOTE_PORT}" -r \
+  "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_BASE}/checkpoints/" \
   "${LOCAL_BASE}"
