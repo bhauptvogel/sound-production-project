@@ -66,4 +66,7 @@ venv/bin/python -m watermarking.eval \
     --output-dir "$OUTPUT_DIR" \
     --output-json "$OUTPUT_DIR/metrics.json"
 
+# Update the results table
+./scripts/create_results_table.py
+
 echo "Evaluation complete! Results saved to $OUTPUT_DIR"

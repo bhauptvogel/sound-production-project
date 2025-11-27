@@ -1,3 +1,4 @@
+#!/home/bmainbird/UL/sound-production/project/venv/bin/python
 import os
 import glob
 import json
@@ -93,9 +94,10 @@ def main():
     
     # Reorder columns to match user request approx
     base_cols = [
-        "Date", "Time", "Epochs", "batch-size", "eps", "alpha", "beta", 
-        "mask_reg", "logit_reg", "decoder_lr", "decoder_steps", 
-        "enc_checkpoint exists", "dec_checkpoint exists", "Plot", "Eval exists"
+        "Date", "Time", "bits", "channel", "Epochs", "batch-size", "eps", 
+        "decoder_lr", "decoder_steps", "alpha", "beta", 
+        "mask_reg", "logit_reg", 
+        "Plot", "enc_checkpoint exists", "dec_checkpoint exists", "Eval exists"
     ]
     
     # Find all Eval columns
