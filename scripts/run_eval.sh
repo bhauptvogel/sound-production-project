@@ -3,7 +3,6 @@ set -e
 
 # Configuration
 DATA_DIR="clips"
-OUTPUT_DIR="results/eval_$(date +%Y%m%d_%H%M%S)"
 CHECKPOINT_DIR="checkpoints"  # Adjust if your checkpoints are elsewhere
 
 # Find latest checkpoints (or specify manually)
@@ -17,6 +16,13 @@ if [ -z "$LATEST_ENC" ] || [ -z "$LATEST_DEC" ]; then
     echo "Please specify checkpoints manually or check the path."
     exit 1
 fi
+
+# Derive Output Directory name from Encoder filename
+# Remove directory path
+ENC_BASENAME=$(basename "$LATEST_ENC")
+# Remove suffix "_encoder.pt"
+ENC_STAMP=${ENC_BASENAME%_encoder.pt}
+OUTPUT_DIR="results/eval_${ENC_STAMP}"
 
 echo "Using Encoder: $LATEST_ENC"
 echo "Using Decoder: $LATEST_DEC"
