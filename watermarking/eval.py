@@ -373,8 +373,25 @@ def run_eval(args):
     
     # Save stats
     if args.output_json:
+        # Ensure any special float values (NaN, Inf) are handled
+        def safe_json_float(val):
+            if math.isnan(val):
+                return None
+            if math.isinf(val):
+                return "Infinity" if val > 0 else "-Infinity"
+            return val
+
+        # Convert aggregation for JSON safety
+        json_stats = {}
+        for name, stats in final_stats.items():
+            json_stats[name] = {
+                "ber": safe_json_float(stats["ber"]),
+                "snr": safe_json_float(stats["snr"]),
+                "lsd": safe_json_float(stats["lsd"])
+            }
+
         with open(args.output_json, 'w') as f:
-            json.dump(final_stats, f, indent=2)
+            json.dump(json_stats, f, indent=2)
         print(f"Saved results to {args.output_json}")
 
 

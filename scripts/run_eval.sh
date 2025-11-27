@@ -6,10 +6,10 @@ DATA_DIR="clips"
 CHECKPOINT_DIR="checkpoints"  # Adjust if your checkpoints are elsewhere
 
 # Find latest checkpoints (or specify manually)
-# This assumes checkpoints are named like "encoder_epochX.pt"
-# You might need to adjust this logic depending on how you save/name them
-LATEST_ENC=$(ls -t ${CHECKPOINT_DIR}/*_encoder.pt 2>/dev/null | head -n1)
-LATEST_DEC=$(ls -t ${CHECKPOINT_DIR}/*_decoder.pt 2>/dev/null | head -n1)
+# Assuming checkpoints start with a timestamp (YYYYMMDD-HHMMSS...)
+# Sort reverse alphabetically (lexicographically) to get the latest timestamp
+LATEST_ENC=$(ls ${CHECKPOINT_DIR}/*_encoder.pt 2>/dev/null | sort -r | head -n1)
+LATEST_DEC=$(ls ${CHECKPOINT_DIR}/*_decoder.pt 2>/dev/null | sort -r | head -n1)
 
 if [ -z "$LATEST_ENC" ] || [ -z "$LATEST_DEC" ]; then
     echo "Error: Could not find encoder/decoder checkpoints in $CHECKPOINT_DIR"
