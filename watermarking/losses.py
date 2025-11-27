@@ -35,9 +35,18 @@ def snr_db(x: torch.Tensor, y: torch.Tensor) -> float:
     x = x[..., :T]
     y = y[..., :T]
 
+    # NOTE: The user reports -Infinity SNR.
+    # This happens if p_signal is 0 (silent input) or if torch.log10 receives 0.
+    # However, we add 1e-12 to p_noise, so log10(p_signal / p_noise) shouldn't be -inf unless p_signal=0.
+    # Let's add epsilon to p_signal as well.
+
     noise = x - y
-    p_signal = torch.mean(x**2)
+    p_signal = torch.mean(x**2) + 1e-12
     p_noise = torch.mean(noise**2) + 1e-12
+    
+    # If signal is effectively silent but we have noise, SNR can be very negative.
+    # If signal is silent and noise is 0, ratio is 1 -> 0 dB.
+    
     return float(10.0 * torch.log10(p_signal / p_noise))
 
 
