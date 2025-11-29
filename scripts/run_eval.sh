@@ -24,6 +24,13 @@ ENC_BASENAME=$(basename "$LATEST_ENC")
 ENC_STAMP=${ENC_BASENAME%_encoder.pt}
 OUTPUT_DIR="results/eval_${ENC_STAMP}"
 
+# Check if results already exist
+if [ -f "$OUTPUT_DIR/metrics.json" ]; then
+    echo "Evaluation results already exist at: $OUTPUT_DIR/metrics.json"
+    echo "Skipping evaluation."
+    exit 0
+fi
+
 echo "Using Encoder: $LATEST_ENC"
 echo "Using Decoder: $LATEST_DEC"
 echo "Output Directory: $OUTPUT_DIR"
