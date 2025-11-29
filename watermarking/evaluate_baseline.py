@@ -248,7 +248,7 @@ def main():
             line += f" | invalid SNR samples={res['snr_invalid']}"
         print(line)
 
-    fig, ax_snr = plt.subplots()
+    fig, ax_snr = plt.subplots(figsize=(6, 4))
     alphas = [res["alpha"] for res in results]
     bers = [res["ber"] for res in results]
 

@@ -81,9 +81,17 @@ def main():
                     # I will keep the full name to distinguish different parameters if any
                     
                     prefix = f"Eval: {attack_name}"
-                    row[f"{prefix} BER"] = scores.get("ber")
-                    row[f"{prefix} SNR"] = scores.get("snr")
-                    row[f"{prefix} LSD"] = scores.get("lsd")
+                    
+                    ber = scores.get("ber")
+                    snr = scores.get("snr")
+                    lsd = scores.get("lsd")
+
+                    if ber is not None:
+                        row[f"{prefix} BER"] = round(ber, 2)
+                    if snr is not None:
+                        row[f"{prefix} SNR"] = round(snr, 2)
+                    if lsd is not None:
+                        row[f"{prefix} LSD"] = round(lsd, 2)
 
             except Exception as e:
                 print(f"Error reading metrics for {run_name}: {e}")
