@@ -106,4 +106,4 @@ EOF
 }
 
 # Run Stage 0 (identity channel). For Stage 1/3, call run_stage with noise_only/full.
-run_stage "none"
+run_stage "noise_only"
