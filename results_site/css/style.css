@@ -76,18 +76,32 @@ tr:hover {
 }
 
 .metric-group {
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     font-size: 12px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+}
+
+.metric-group:last-child {
+    border-bottom: none;
 }
 
 .metric-name {
+    display: block;
     font-weight: bold;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
     color: #555;
 }
 
-.metric-values {
-    color: #666;
-    margin-left: 5px;
+.metric-grid span {
+    white-space: nowrap;
 }
 
 .badge {
@@ -126,4 +140,28 @@ tr:hover {
 .channel-none { background-color: #28a745; }      /* Green */
 .channel-noise { background-color: #ffc107; color: #212529; } /* Yellow/Orange */
 .channel-full { background-color: #dc3545; }       /* Red */
+
+/* Stats Toggle */
+.show-stats-btn {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+.show-stats-btn:hover {
+    background-color: #5a6268;
+}
+
+.stats-content {
+    margin-top: 5px;
+    padding: 5px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
 

@@ -43,8 +43,16 @@ function renderTable(data) {
         // Metrics
         let metricsHtml = '';
         if (row.metrics && Object.keys(row.metrics).length > 0) {
-            // Sort attacks alphabetically
-            const attacks = Object.keys(row.metrics).sort();
+            metricsHtml += `<button class="show-stats-btn" onclick="toggleStats(this)">Show Evaluation Stats</button>
+                            <div class="stats-content" style="display: none;">`;
+            
+            // Custom sort: Identity first, then alphabetical
+            const attacks = Object.keys(row.metrics).sort((a, b) => {
+                if (a.toLowerCase() === 'identity') return -1;
+                if (b.toLowerCase() === 'identity') return 1;
+                return a.localeCompare(b);
+            });
+
             attacks.forEach(attack => {
                 const m = row.metrics[attack];
                 const ber = m.ber !== null ? m.ber.toFixed(3) : '-';
@@ -53,9 +61,14 @@ function renderTable(data) {
                 
                 metricsHtml += `<div class="metric-group">
                     <span class="metric-name">${attack}:</span>
-                    <span class="metric-values">BER:${ber} SNR:${snr} LSD:${lsd}</span>
+                    <div class="metric-grid">
+                        <span>BER: ${ber}</span>
+                        <span>SNR: ${snr}</span>
+                        <span>LSD: ${lsd}</span>
+                    </div>
                 </div>`;
             });
+            metricsHtml += `</div>`;
         } else {
             metricsHtml = '<span style="color:#ccc">No eval data</span>';
         }
@@ -106,5 +119,16 @@ function sortTable(key) {
     });
     
     renderTable(window.allData);
+}
+
+function toggleStats(btn) {
+    const content = btn.nextElementSibling;
+    if (content.style.display === "none") {
+        content.style.display = "block";
+        btn.textContent = "Hide Evaluation Stats";
+    } else {
+        content.style.display = "none";
+        btn.textContent = "Show Evaluation Stats";
+    }
 }
 

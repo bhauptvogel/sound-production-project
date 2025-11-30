@@ -101,9 +101,6 @@ venv/bin/python -m watermarking.eval \
     --output-dir "$OUTPUT_DIR" \
     --output-json "$OUTPUT_DIR/metrics.json"
 
-# Update the results table
-./scripts/create_results_table.py
-
 # Generate the site
 ./scripts/generate_site.py
 
