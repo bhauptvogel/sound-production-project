@@ -1,3 +1,6 @@
+.cursor/
+results_site/data.json
+results_site/plots/
 results_table.*
 AGENTS.md
 audio.wav

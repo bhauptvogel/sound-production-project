@@ -104,4 +104,7 @@ venv/bin/python -m watermarking.eval \
 # Update the results table
 ./scripts/create_results_table.py
 
+# Generate the site
+./scripts/generate_site.py
+
 echo "Evaluation complete! Results saved to $OUTPUT_DIR"

@@ -134,14 +134,14 @@ def main():
 
     # Try saving as ODS or XLSX if possible
     # User asked for LibreOffice file (ODS)
-    try:
-        output_ods = os.path.join(project_root, "results_table.ods")
-        df.to_excel(output_ods, engine="odf", index=False)
-        print(f"Saved results table to {output_ods}")
-    except ImportError:
-        print("odfpy not installed, skipping ODS export.")
-    except Exception as e:
-        print(f"Could not save ODS: {e}")
+    # try:
+    #     output_ods = os.path.join(project_root, "results_table.ods")
+    #     df.to_excel(output_ods, engine="odf", index=False)
+    #     print(f"Saved results table to {output_ods}")
+    # except ImportError:
+    #     print("odfpy not installed, skipping ODS export.")
+    # except Exception as e:
+    #     print(f"Could not save ODS: {e}")
 
 if __name__ == "__main__":
     main()
