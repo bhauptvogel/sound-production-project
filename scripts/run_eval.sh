@@ -5,15 +5,43 @@ set -e
 DATA_DIR="clips"
 CHECKPOINT_DIR="checkpoints"  # Adjust if your checkpoints are elsewhere
 
-# Find latest checkpoints (or specify manually)
-# Assuming checkpoints start with a timestamp (YYYYMMDD-HHMMSS...)
-# Sort reverse alphabetically (lexicographically) to get the latest timestamp
-LATEST_ENC=$(ls ${CHECKPOINT_DIR}/*_encoder.pt 2>/dev/null | sort -r | head -n1)
-LATEST_DEC=$(ls ${CHECKPOINT_DIR}/*_decoder.pt 2>/dev/null | sort -r | head -n1)
+# Argument handling
+ARG1="$1"
+
+if [ -z "$ARG1" ]; then
+    # 1. No arguments: Find the latest checkpoints
+    echo "No arguments provided. Searching for latest checkpoints in $CHECKPOINT_DIR..."
+    LATEST_ENC=$(ls ${CHECKPOINT_DIR}/*_encoder.pt 2>/dev/null | sort -r | head -n1)
+    LATEST_DEC=$(ls ${CHECKPOINT_DIR}/*_decoder.pt 2>/dev/null | sort -r | head -n1)
+
+elif [ -f "$ARG1" ]; then
+    # 2. Argument is a file path: Assume explicit encoder and decoder paths provided
+    ENC_CKPT="$1"
+    DEC_CKPT="$2"
+    if [ -z "$DEC_CKPT" ]; then
+        echo "Error: If providing an encoder file path, you must also provide the decoder file path."
+        exit 1
+    fi
+    LATEST_ENC="$ENC_CKPT"
+    LATEST_DEC="$DEC_CKPT"
+    echo "Using explicitly provided checkpoints."
+
+else
+    # 3. Argument is a timestamp prefix: Find matching checkpoints
+    TIMESTAMP="$1"
+    echo "Searching for checkpoints matching timestamp: $TIMESTAMP"
+    
+    # Find files starting with the timestamp
+    LATEST_ENC=$(ls ${CHECKPOINT_DIR}/${TIMESTAMP}*_encoder.pt 2>/dev/null | head -n1)
+    LATEST_DEC=$(ls ${CHECKPOINT_DIR}/${TIMESTAMP}*_decoder.pt 2>/dev/null | head -n1)
+fi
 
 if [ -z "$LATEST_ENC" ] || [ -z "$LATEST_DEC" ]; then
-    echo "Error: Could not find encoder/decoder checkpoints in $CHECKPOINT_DIR"
-    echo "Please specify checkpoints manually or check the path."
+    echo "Error: Could not find matching encoder/decoder checkpoints."
+    echo "Usage:"
+    echo "  ./scripts/run_eval.sh                                     # Auto-detect latest"
+    echo "  ./scripts/run_eval.sh 20251127-092954                     # By timestamp prefix"
+    echo "  ./scripts/run_eval.sh path/to/encoder.pt path/to/decoder.pt  # Explicit paths"
     exit 1
 fi
 
