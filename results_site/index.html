@@ -11,22 +11,61 @@
         <header>
             <h1>Neural Audio Watermarking Results</h1>
             <p>Overview of experiment runs, metrics, and visualizations.</p>
-            <div class="controls">
-                <input type="text" id="search" placeholder="Search runs..." onkeyup="filterTable()">
-            </div>
         </header>
+
+        <div class="filters-container">
+            <div class="filter-group">
+                <label for="search-text">Search</label>
+                <input type="text" id="search-text" placeholder="Run name, ID..." oninput="applyFilters()">
+            </div>
+            <div class="filter-group">
+                <label for="filter-channel">Channel</label>
+                <select id="filter-channel" onchange="applyFilters()">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-bits">Bits</label>
+                <select id="filter-bits" onchange="applyFilters()">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-eps">Epsilon</label>
+                <select id="filter-eps" onchange="applyFilters()">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-alpha">Alpha (L2)</label>
+                <select id="filter-alpha" onchange="applyFilters()">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-beta">Beta (LSD)</label>
+                <select id="filter-beta" onchange="applyFilters()">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn-secondary" onclick="resetFilters()">Reset</button>
+            </div>
+        </div>
 
         <div class="table-container">
             <table id="results-table">
                 <thead>
                     <tr>
-                        <th onclick="sortTable('Date')">Date/Time</th>
-                        <th onclick="sortTable('bits')">Bits</th>
-                        <th onclick="sortTable('eps')">Epsilon</th>
-                        <th onclick="sortTable('alpha')">Alpha (L2)</th>
-                        <th onclick="sortTable('beta')">Beta (LSD)</th>
-                        <th onclick="sortTable('channel')">Channel</th>
-                        <th onclick="sortTable('Epochs')">Epochs</th>
+                        <th data-sort="Date" onclick="handleSort('Date')">Date/Time <span class="sort-icon"></span></th>
+                        <th data-sort="bits" onclick="handleSort('bits')">Bits <span class="sort-icon"></span></th>
+                        <th data-sort="eps" onclick="handleSort('eps')">Epsilon <span class="sort-icon"></span></th>
+                        <th data-sort="alpha" onclick="handleSort('alpha')">Alpha (L2) <span class="sort-icon"></span></th>
+                        <th data-sort="beta" onclick="handleSort('beta')">Beta (LSD) <span class="sort-icon"></span></th>
+                        <th data-sort="decoder_lr" onclick="handleSort('decoder_lr')">Dec LR <span class="sort-icon"></span></th>
+                        <th data-sort="decoder_steps" onclick="handleSort('decoder_steps')">Dec Steps <span class="sort-icon"></span></th>
+                        <th data-sort="channel" onclick="handleSort('channel')">Channel <span class="sort-icon"></span></th>
+                        <th data-sort="Epochs" onclick="handleSort('Epochs')">Epochs <span class="sort-icon"></span></th>
                         <th>Checkpoints</th>
                         <th>Eval Metrics (BER / SNR / LSD)</th>
                         <th>Plot</th>
@@ -37,10 +76,10 @@
                 </tbody>
             </table>
         </div>
+        <div id="row-count" style="margin-top: 10px; color: #666; font-size: 14px;"></div>
     </div>
 
     <script src="data.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>
-
