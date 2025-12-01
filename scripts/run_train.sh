@@ -26,7 +26,7 @@ source venv/bin/activate
 #   - Expected: Model learns to survive realistic distortions
 # ============================================================================
 
-# Shared experiment configuration
+# Default configuration
 DATA_DIR="clips/"
 EPOCHS=10
 BATCH=32
@@ -39,7 +39,58 @@ LOGIT_REG=0.0
 DECODER_LR=3e-4
 DECODER_STEPS=0
 SAVE_PT=1 # 1 = save checkpoints, 0 = don't save
+CHANNEL_MODE="noise_only" # default stage
 # MAX_STEPS=500
+
+# Parse arguments
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --data-dir=*)
+      DATA_DIR="${1#*=}"
+      ;;
+    --epochs=*)
+      EPOCHS="${1#*=}"
+      ;;
+    --batch-size=*)
+      BATCH="${1#*=}"
+      ;;
+    --n-bits=*)
+      NUM_BITS="${1#*=}"
+      ;;
+    --eps=*)
+      EPS="${1#*=}"
+      ;;
+    --alpha-l2=*)
+      ALPHA="${1#*=}"
+      ;;
+    --beta-lsd=*)
+      BETA="${1#*=}"
+      ;;
+    --mask-reg=*)
+      MASK_REG="${1#*=}"
+      ;;
+    --logit-reg=*)
+      LOGIT_REG="${1#*=}"
+      ;;
+    --decoder-lr=*)
+      DECODER_LR="${1#*=}"
+      ;;
+    --decoder-steps=*)
+      DECODER_STEPS="${1#*=}"
+      ;;
+    --save-pt=*)
+      SAVE_PT="${1#*=}"
+      ;;
+    --channel-mode=*)
+      CHANNEL_MODE="${1#*=}"
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
+  esac
+  shift
+done
 
 run_stage() {
   local channel_mode="$1"
@@ -105,5 +156,5 @@ EOF
     # --max-steps-per-epoch "${MAX_STEPS}"
 }
 
-# Run Stage 0 (identity channel). For Stage 1/3, call run_stage with noise_only/full.
-run_stage "noise_only"
+# Run experiment with configured (or default) channel mode
+run_stage "${CHANNEL_MODE}"
