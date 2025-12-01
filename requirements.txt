@@ -1,7 +1,6 @@
 aiohttp==3.8.1
 aiosignal==1.2.0
 annotated-types==0.7.0
-apturl==0.5.2
 async-timeout==4.0.1
 attrs==21.2.0
 av==13.1.0

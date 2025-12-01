@@ -218,8 +218,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251127-092954_bits16_eps0.1_alpha0.0_beta0.0_mask0.0_logit0.0_decLR3e-4_decSteps0_bs32_ep10_chnone.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.3024,
+        "snr": 30.61,
+        "lsd": 0.007
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.4108,
+        "snr": 30.61,
+        "lsd": 0.007
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4377,
+        "snr": 30.61,
+        "lsd": 0.007
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4653,
+        "snr": 30.61,
+        "lsd": 0.007
+      },
+      "MP3 (128k)": {
+        "ber": 0.3574,
+        "snr": 30.61,
+        "lsd": 0.007
+      },
+      "MP3 (64k)": {
+        "ber": 0.3832,
+        "snr": 30.61,
+        "lsd": 0.007
+      },
+      "AAC (128k)": {
+        "ber": 0.336,
+        "snr": 30.61,
+        "lsd": 0.007
+      },
+      "Quant (12-bit)": {
+        "ber": 0.3389,
+        "snr": 30.61,
+        "lsd": 0.007
+      },
+      "Random EQ": {
+        "ber": 0.4114,
+        "snr": 30.61,
+        "lsd": 0.007
+      }
+    }
   },
   {
     "Date": "20251126",
@@ -239,7 +285,53 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251126-234814_bits16_eps0.2_alpha0.0_beta0.0_mask0.0_logit0.0_decLR5e-4_decSteps0_bs32_ep10_chnone.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.2047,
+        "snr": 15.81,
+        "lsd": 0.031
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.4322,
+        "snr": 15.81,
+        "lsd": 0.031
+      },
+      "Resample (0.9x)": {
+        "ber": 0.5003,
+        "snr": 15.81,
+        "lsd": 0.031
+      },
+      "Resample (1.1x)": {
+        "ber": 0.5004,
+        "snr": 15.81,
+        "lsd": 0.031
+      },
+      "MP3 (128k)": {
+        "ber": 0.2991,
+        "snr": 15.81,
+        "lsd": 0.031
+      },
+      "MP3 (64k)": {
+        "ber": 0.3557,
+        "snr": 15.81,
+        "lsd": 0.031
+      },
+      "AAC (128k)": {
+        "ber": 0.29,
+        "snr": 15.81,
+        "lsd": 0.031
+      },
+      "Quant (12-bit)": {
+        "ber": 0.2871,
+        "snr": 15.81,
+        "lsd": 0.031
+      },
+      "Random EQ": {
+        "ber": 0.2525,
+        "snr": 15.81,
+        "lsd": 0.031
+      }
+    }
   }
 ];
