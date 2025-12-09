@@ -219,6 +219,7 @@ th.desc .sort-icon::after {
 .channel-none { background-color: #28a745; }      /* Green */
 .channel-noise { background-color: #ffc107; color: #212529; } /* Yellow/Orange */
 .channel-full { background-color: #dc3545; }       /* Red */
+.channel-full-hf0 { background-color: #6f42c1; }   /* Purple */
 
 /* Stats Toggle */
 .show-stats-btn {

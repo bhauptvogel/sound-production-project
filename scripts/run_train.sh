@@ -41,16 +41,16 @@ DATA_DIR="clips/"
 EPOCHS=10
 BATCH=32
 NUM_BITS=16
-EPS=0.2
-ALPHA=0.1
-BETA=0.1
-MASK_REG=0.01
+EPS=0.05
+ALPHA=1.0
+BETA=1.0
+MASK_REG=0.1
 LOGIT_REG=0.01
 DECODER_LR=3e-4
 DECODER_STEPS=0
 SAVE_PT=1 # 1 = save checkpoints, 0 = don't save
-CHANNEL_MODE="full" # default stage
-USE_HF=0 # 0 = auto-detect (prefer local data), 1 = force HF
+CHANNEL_MODE="noise_only" # default stage
+USE_HF=0 # 0 = auto-detect, 1 = force HF
 # MAX_STEPS=500
 
 # Parse arguments

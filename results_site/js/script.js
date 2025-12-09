@@ -225,6 +225,7 @@ function renderTable(data) {
         if (row.channel === 'none') channelClass = 'channel-none';
         else if (row.channel === 'noise_only') channelClass = 'channel-noise';
         else if (row.channel === 'full') channelClass = 'channel-full';
+        else if (row.channel === 'full_hf0') channelClass = 'channel-full-hf0';
         
         const channelCell = `<td><span class="channel-badge ${channelClass}">${row.channel}</span></td>`;
 
