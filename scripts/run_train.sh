@@ -13,6 +13,11 @@ else
     source venv/bin/activate
 fi
 
+# Move HF cache to workspace to avoid disk quota issues on home dir
+export HF_HOME="/workspace/sound-production-project/hf_cache"
+export HF_DATASETS_CACHE="${HF_HOME}/datasets"
+mkdir -p "${HF_DATASETS_CACHE}"
+
 # ============================================================================
 # STAGED TRAINING APPROACH
 # ============================================================================
