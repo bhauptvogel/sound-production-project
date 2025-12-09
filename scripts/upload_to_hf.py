@@ -49,11 +49,22 @@ def upload_clips(
         login(token=token)
     
     # Push to hub
-    ds.push_to_hub(
-        repo_id, 
-        private=private, 
-        num_proc=num_proc
-    )
+    try:
+        ds.push_to_hub(
+            repo_id, 
+            private=private, 
+            num_proc=num_proc
+        )
+    except RuntimeError as e:
+        if "subprocesses has abruptly died" in str(e) and num_proc > 1:
+            print("Multiprocessing failed (likely OOM). Retrying with num_proc=1...")
+            ds.push_to_hub(
+                repo_id, 
+                private=private, 
+                num_proc=1
+            )
+        else:
+            raise e
     
     print(f"Successfully uploaded dataset to https://huggingface.co/datasets/{repo_id}")
 
