@@ -32,14 +32,14 @@ EPOCHS=10
 BATCH=32
 NUM_BITS=16
 EPS=0.2
-ALPHA=0.0
-BETA=0.0
-MASK_REG=0.0
-LOGIT_REG=0.0
+ALPHA=0.1
+BETA=0.1
+MASK_REG=0.01
+LOGIT_REG=0.01
 DECODER_LR=3e-4
 DECODER_STEPS=0
 SAVE_PT=1 # 1 = save checkpoints, 0 = don't save
-CHANNEL_MODE="noise_only" # default stage
+CHANNEL_MODE="full" # default stage
 # MAX_STEPS=500
 
 # Parse arguments

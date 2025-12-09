@@ -7,7 +7,7 @@ if [[ $# -lt 1 ]]; then
 fi
 
 REMOTE_USER="root"
-REMOTE_HOST="213.173.107.102"
+REMOTE_HOST="213.173.98.107"
 REMOTE_PORT="$1"
 SSH_KEY="${HOME}/.ssh/id_ed25519"
 

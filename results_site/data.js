@@ -1,6 +1,73 @@
 window.resultsData = [
   {
     "Date": "20251201",
+    "Time": "164410",
+    "bits": 16,
+    "eps": 0.2,
+    "alpha": 0.0,
+    "beta": 0.0,
+    "mask_reg": 0.0,
+    "logit_reg": 0.0,
+    "decoder_lr": "3e-4",
+    "decoder_steps": 0,
+    "batch_size": 32,
+    "Epochs": 20,
+    "channel": "noise_only",
+    "run_name": "20251201-164410_bits16_eps0.2_alpha0.0_beta0.0_mask0.0_logit0.0_decLR3e-4_decSteps0_bs32_ep20_chnoise_only",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251201-164410_bits16_eps0.2_alpha0.0_beta0.0_mask0.0_logit0.0_decLR3e-4_decSteps0_bs32_ep20_chnoise_only.png",
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.1682,
+        "snr": 15.42,
+        "lsd": 0.035
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.3302,
+        "snr": 15.42,
+        "lsd": 0.035
+      },
+      "Resample (0.9x)": {
+        "ber": 0.391,
+        "snr": 15.42,
+        "lsd": 0.035
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4277,
+        "snr": 15.42,
+        "lsd": 0.035
+      },
+      "MP3 (128k)": {
+        "ber": 0.2646,
+        "snr": 15.42,
+        "lsd": 0.035
+      },
+      "MP3 (64k)": {
+        "ber": 0.3079,
+        "snr": 15.42,
+        "lsd": 0.035
+      },
+      "AAC (128k)": {
+        "ber": 0.2417,
+        "snr": 15.42,
+        "lsd": 0.035
+      },
+      "Quant (12-bit)": {
+        "ber": 0.23,
+        "snr": 15.42,
+        "lsd": 0.035
+      },
+      "Random EQ": {
+        "ber": 0.316,
+        "snr": 15.42,
+        "lsd": 0.035
+      }
+    }
+  },
+  {
+    "Date": "20251201",
     "Time": "125751",
     "bits": 16,
     "eps": 0.2,
@@ -17,8 +84,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251201-125751_bits16_eps0.2_alpha0.0_beta0.0_mask0.0_logit0.0_decLR3e-4_decSteps0_bs32_ep10_chnoise_only.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.1915,
+        "snr": 18.35,
+        "lsd": 0.019
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.3688,
+        "snr": 18.35,
+        "lsd": 0.019
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4492,
+        "snr": 18.35,
+        "lsd": 0.019
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4593,
+        "snr": 18.35,
+        "lsd": 0.019
+      },
+      "MP3 (128k)": {
+        "ber": 0.2709,
+        "snr": 18.35,
+        "lsd": 0.019
+      },
+      "MP3 (64k)": {
+        "ber": 0.3254,
+        "snr": 18.35,
+        "lsd": 0.019
+      },
+      "AAC (128k)": {
+        "ber": 0.2588,
+        "snr": 18.35,
+        "lsd": 0.019
+      },
+      "Quant (12-bit)": {
+        "ber": 0.2569,
+        "snr": 18.35,
+        "lsd": 0.019
+      },
+      "Random EQ": {
+        "ber": 0.2905,
+        "snr": 18.35,
+        "lsd": 0.019
+      }
+    }
   },
   {
     "Date": "20251127",

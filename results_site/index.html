@@ -19,12 +19,6 @@
                 <input type="text" id="search-text" placeholder="Run name, ID..." oninput="applyFilters()">
             </div>
             <div class="filter-group">
-                <label for="filter-channel">Channel</label>
-                <select id="filter-channel" onchange="applyFilters()">
-                    <option value="all">All</option>
-                </select>
-            </div>
-            <div class="filter-group">
                 <label for="filter-bits">Bits</label>
                 <select id="filter-bits" onchange="applyFilters()">
                     <option value="all">All</option>
@@ -46,6 +40,38 @@
                 <label for="filter-beta">Beta (LSD)</label>
                 <select id="filter-beta" onchange="applyFilters()">
                     <option value="all">All</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-declr">Dec LR</label>
+                <select id="filter-declr" onchange="applyFilters()">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-decsteps">Dec Steps</label>
+                <select id="filter-decsteps" onchange="applyFilters()">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-channel">Channel</label>
+                <select id="filter-channel" onchange="applyFilters()">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-epochs">Epochs</label>
+                <select id="filter-epochs" onchange="applyFilters()">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-eval">Eval Stats</label>
+                <select id="filter-eval" onchange="applyFilters()">
+                    <option value="all">All</option>
+                    <option value="yes">Available</option>
+                    <option value="no">Missing</option>
                 </select>
             </div>
             <div class="filter-actions">

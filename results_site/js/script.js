@@ -26,6 +26,9 @@ function populateFilters(data) {
     const eps = new Set();
     const alphas = new Set();
     const betas = new Set();
+    const decLRs = new Set();
+    const decSteps = new Set();
+    const epochs = new Set();
 
     data.forEach(row => {
         if (row.channel) channels.add(row.channel);
@@ -33,6 +36,9 @@ function populateFilters(data) {
         if (row.eps !== undefined) eps.add(row.eps);
         if (row.alpha !== undefined) alphas.add(row.alpha);
         if (row.beta !== undefined) betas.add(row.beta);
+        if (row.decoder_lr !== undefined) decLRs.add(row.decoder_lr);
+        if (row.decoder_steps !== undefined) decSteps.add(row.decoder_steps);
+        if (row.Epochs !== undefined) epochs.add(row.Epochs);
     });
 
     populateSelect('filter-channel', Array.from(channels).sort());
@@ -40,6 +46,9 @@ function populateFilters(data) {
     populateSelect('filter-eps', Array.from(eps).sort((a,b) => a-b));
     populateSelect('filter-alpha', Array.from(alphas).sort((a,b) => a-b));
     populateSelect('filter-beta', Array.from(betas).sort((a,b) => a-b));
+    populateSelect('filter-declr', Array.from(decLRs).sort());
+    populateSelect('filter-decsteps', Array.from(decSteps).sort((a,b) => a-b));
+    populateSelect('filter-epochs', Array.from(epochs).sort((a,b) => a-b));
 }
 
 function populateSelect(id, values) {
@@ -63,6 +72,10 @@ function applyFilters() {
     const filterEps = document.getElementById('filter-eps').value;
     const filterAlpha = document.getElementById('filter-alpha').value;
     const filterBeta = document.getElementById('filter-beta').value;
+    const filterDecLR = document.getElementById('filter-declr').value;
+    const filterDecSteps = document.getElementById('filter-decsteps').value;
+    const filterEpochs = document.getElementById('filter-epochs').value;
+    const filterEval = document.getElementById('filter-eval').value;
 
     currentData = window.allData.filter(row => {
         // Text Search
@@ -78,6 +91,16 @@ function applyFilters() {
         if (filterEps !== 'all' && String(row.eps) !== filterEps) return false;
         if (filterAlpha !== 'all' && String(row.alpha) !== filterAlpha) return false;
         if (filterBeta !== 'all' && String(row.beta) !== filterBeta) return false;
+        if (filterDecLR !== 'all' && String(row.decoder_lr) !== filterDecLR) return false;
+        if (filterDecSteps !== 'all' && String(row.decoder_steps) !== filterDecSteps) return false;
+        if (filterEpochs !== 'all' && String(row.Epochs) !== filterEpochs) return false;
+        
+        // Eval Stats Available
+        if (filterEval !== 'all') {
+            const hasEval = row.eval_exists === true;
+            if (filterEval === 'yes' && !hasEval) return false;
+            if (filterEval === 'no' && hasEval) return false;
+        }
 
         return true;
     });
@@ -99,6 +122,10 @@ function resetFilters() {
     document.getElementById('filter-eps').value = 'all';
     document.getElementById('filter-alpha').value = 'all';
     document.getElementById('filter-beta').value = 'all';
+    document.getElementById('filter-declr').value = 'all';
+    document.getElementById('filter-decsteps').value = 'all';
+    document.getElementById('filter-epochs').value = 'all';
+    document.getElementById('filter-eval').value = 'all';
     applyFilters();
 }
 
