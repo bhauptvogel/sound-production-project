@@ -129,10 +129,10 @@ class HuggingFaceAudioDataset(Dataset):
         print(f"Loading HF dataset '{dataset_name}' (split='train' base)...")
         # Load the dataset (usually they have a train split by default)
         try:
-            ds = load_dataset(dataset_name, split="train", token=token, trust_remote_code=True)
+            ds = load_dataset(dataset_name, split="train", token=token)
         except Exception as e:
              # Fallback if no train split
-             ds = load_dataset(dataset_name, split=None, token=token, trust_remote_code=True)
+             ds = load_dataset(dataset_name, split=None, token=token)
              if isinstance(ds, dict):
                  # take first split available
                  ds = next(iter(ds.values()))
