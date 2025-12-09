@@ -1,5 +1,3 @@
-# train.py
-
 #!/usr/bin/env python
 
 import argparse
@@ -12,6 +10,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from pathlib import Path
 from torch.utils.data import DataLoader
+import torch.nn as nn
 
 from watermarking.stft_utils import STFTConfig
 from watermarking.models import (
@@ -22,7 +21,7 @@ from watermarking.models import (
     apply_watermark_mask,
 )
 from watermarking.channel import ChannelConfig, DifferentiableChannel
-from watermarking.dataset import RandomClipDataset
+from watermarking.dataset import RandomClipDataset, HuggingFaceAudioDataset
 from watermarking.losses import (
     SpectralLossConfig,
     bit_loss_bce,
@@ -63,6 +62,7 @@ class TrainingConfig:
     encoder_ckpt: str | None = None
     decoder_ckpt: str | None = None
     save_pt: bool = True
+    use_hf: bool = False
 
     # STFT
     n_fft: int = 1024
@@ -78,12 +78,37 @@ def train(cfg: TrainingConfig):
     device = torch.device(cfg.device)
 
     # Dataset + loader
-    dataset = RandomClipDataset(
-        root_dir=cfg.data_dir,
-        clip_duration=cfg.clip_duration,
-        target_sr=cfg.sample_rate,
-        split="train",
-    )
+    # Check if local directory exists and has content
+    data_path = Path(cfg.data_dir)
+    use_hf = cfg.use_hf
+    
+    if not use_hf:
+        if not data_path.exists():
+            print(f"Data directory '{cfg.data_dir}' does not exist. Switching to HF dataset.")
+            use_hf = True
+        elif not any(data_path.rglob("*.wav")) and not any(data_path.rglob("*.flac")) and not any(data_path.rglob("*.ogg")):
+             # Check if it's empty of audio files (simplified check)
+             # Using rglob to find any audio file
+             print(f"Data directory '{cfg.data_dir}' contains no audio files. Switching to HF dataset.")
+             use_hf = True
+         
+    if use_hf:
+        print("Using Hugging Face dataset: benmainbird/watermarking-clips")
+        dataset = HuggingFaceAudioDataset(
+            dataset_name="benmainbird/watermarking-clips",
+            clip_duration=cfg.clip_duration,
+            target_sr=cfg.sample_rate,
+            split="train",
+        )
+    else:
+        print(f"Loading local dataset from {cfg.data_dir}")
+        dataset = RandomClipDataset(
+            root_dir=cfg.data_dir,
+            clip_duration=cfg.clip_duration,
+            target_sr=cfg.sample_rate,
+            split="train",
+        )
+
     loader = DataLoader(
         dataset,
         batch_size=cfg.batch_size,
@@ -255,9 +280,6 @@ def train(cfg: TrainingConfig):
                 snr=f"{running_snr / n:.1f}dB",
             )
 
-            if step % 50 == 0:
-                pass # Debugging prints removed
-
         n = step
         print(
             f"[Epoch {epoch}] "
@@ -269,8 +291,6 @@ def train(cfg: TrainingConfig):
             f"BER {running_ber/n:.4f} | "
             f"SNR {running_snr/n:.2f} dB"
         )
-
-        # TODO: save encoder/decoder checkpoints here if you want
 
         epoch_metrics.append(
             {
@@ -358,6 +378,8 @@ def parse_args() -> TrainingConfig:
                     help="Path to save decoder checkpoint")
     ap.add_argument("--save-pt", type=int, default=1,
                     help="Whether to save checkpoints (1=yes, 0=no)")
+    ap.add_argument("--use-hf", action="store_true",
+                    help="Force use of Hugging Face dataset even if local data exists")
     args = ap.parse_args()
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -382,6 +404,7 @@ def parse_args() -> TrainingConfig:
         encoder_ckpt=args.encoder_ckpt,
         decoder_ckpt=args.decoder_ckpt,
         save_pt=bool(args.save_pt),
+        use_hf=args.use_hf,
     )
 
 

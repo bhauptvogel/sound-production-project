@@ -40,6 +40,7 @@ DECODER_LR=3e-4
 DECODER_STEPS=0
 SAVE_PT=1 # 1 = save checkpoints, 0 = don't save
 CHANNEL_MODE="full" # default stage
+USE_HF=1 # 0 = auto-detect, 1 = force HF
 # MAX_STEPS=500
 
 # Parse arguments
@@ -84,6 +85,12 @@ while [ $# -gt 0 ]; do
     --channel-mode=*)
       CHANNEL_MODE="${1#*=}"
       ;;
+    --use-hf=*)
+      USE_HF="${1#*=}"
+      ;;
+    --use-hf)
+      USE_HF=1
+      ;;
     *)
       echo "Unknown argument: $1"
       exit 1
@@ -96,9 +103,9 @@ run_stage() {
   local channel_mode="$1"
 
   mkdir -p checkpoints plots results
-  RUN_TAG=$(printf "bits%s_eps%s_alpha%s_beta%s_mask%s_logit%s_decLR%s_decSteps%s_bs%s_ep%s_ch%s" \
+  RUN_TAG=$(printf "bits%s_eps%s_alpha%s_beta%s_mask%s_logit%s_decLR%s_decSteps%s_bs%s_ep%s_ch%s_hf%s" \
     "${NUM_BITS}" "${EPS}" "${ALPHA}" "${BETA}" "${MASK_REG}" "${LOGIT_REG}" \
-    "${DECODER_LR}" "${DECODER_STEPS}" "${BATCH}" "${EPOCHS}" "${channel_mode}")
+    "${DECODER_LR}" "${DECODER_STEPS}" "${BATCH}" "${EPOCHS}" "${channel_mode}" "${USE_HF}")
   TIMESTAMP=$(date +%Y%m%d-%H%M%S)
   RUN_NAME="${TIMESTAMP}_${RUN_TAG}"
   PLOT_PATH="plots/${RUN_NAME}.png"
@@ -129,28 +136,37 @@ enc-checkpoint  = ${ENC_CKPT}
 dec-checkpoint  = ${DEC_CKPT}
 save-pt         = ${SAVE_PT}
 log-file        = ${LOG_FILE}
+use-hf          = ${USE_HF}
 ============================================================
 EOF
 
+  CMD=(
+      python -m watermarking.train 
+      --data-dir "${DATA_DIR}" 
+      --epochs "${EPOCHS}" 
+      --batch-size "${BATCH}" 
+      --n-bits "${NUM_BITS}" 
+      --eps "${EPS}" 
+      --alpha-l2 "${ALPHA}" 
+      --beta-lsd "${BETA}" 
+      --mask-reg "${MASK_REG}" 
+      --logit-reg "${LOGIT_REG}" 
+      --decoder-lr "${DECODER_LR}" 
+      --decoder-steps "${DECODER_STEPS}" 
+      --channel-mode "${channel_mode}" 
+      --plot-path "${PLOT_PATH}" 
+      --encoder-ckpt "${ENC_CKPT}" 
+      --decoder-ckpt "${DEC_CKPT}" 
+      --save-pt "${SAVE_PT}" 
+      --lr "${DECODER_LR}"
+  )
+  
+  if [ "${USE_HF}" -eq 1 ]; then
+      CMD+=(--use-hf)
+  fi
+
   TMP_LOG=$(mktemp)
-  python -m watermarking.train \
-    --data-dir "${DATA_DIR}" \
-    --epochs "${EPOCHS}" \
-    --batch-size "${BATCH}" \
-    --n-bits "${NUM_BITS}" \
-    --eps "${EPS}" \
-    --alpha-l2 "${ALPHA}" \
-    --beta-lsd "${BETA}" \
-    --mask-reg "${MASK_REG}" \
-    --logit-reg "${LOGIT_REG}" \
-    --decoder-lr "${DECODER_LR}" \
-    --decoder-steps "${DECODER_STEPS}" \
-    --channel-mode "${channel_mode}" \
-    --plot-path "${PLOT_PATH}" \
-    --encoder-ckpt "${ENC_CKPT}" \
-    --decoder-ckpt "${DEC_CKPT}" \
-    --save-pt "${SAVE_PT}" \
-    --lr "${DECODER_LR}" | tee "${TMP_LOG}"
+  "${CMD[@]}" | tee "${TMP_LOG}"
   cat "${TMP_LOG}" >> "${LOG_FILE}"
   rm -f "${TMP_LOG}"
     # --max-steps-per-epoch "${MAX_STEPS}"

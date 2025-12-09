@@ -30,7 +30,7 @@ from watermarking.channel import (
     _ensure_batch,
 )
 from watermarking.stft_utils import STFTConfig, stft, stft_logmag
-from watermarking.dataset import RandomClipDataset
+from watermarking.dataset import RandomClipDataset, HuggingFaceAudioDataset
 from watermarking.losses import snr_db, log_spectral_distance_weighted, SpectralLossConfig
 from watermarking.data import load_audio, save_audio
 
@@ -184,16 +184,41 @@ def run_eval(args):
     )
     
     # Setup Dataset
+    # Check if local directory exists or fallback to HF
+    use_hf = args.use_hf
+    dataset = None
+    
+    # If eval_dir is provided, check if valid, else switch to HF
     if args.eval_dir:
         dataset_dir = Path(args.eval_dir)
-        if not dataset_dir.exists():
-            raise FileNotFoundError(f"Dataset directory {dataset_dir} does not exist.")
-        dataset = RandomClipDataset(
-            root_dir=dataset_dir,
+        if not use_hf:
+            if not dataset_dir.exists():
+                print(f"Dataset directory {dataset_dir} does not exist. Switching to HF dataset.")
+                use_hf = True
+            elif not any(dataset_dir.rglob("*.wav")) and not any(dataset_dir.rglob("*.flac")) and not any(dataset_dir.rglob("*.ogg")):
+                 print(f"Dataset directory {dataset_dir} contains no audio files. Switching to HF dataset.")
+                 use_hf = True
+    elif not args.input_file:
+         # No input file and no eval dir -> try HF
+         use_hf = True
+
+    if use_hf:
+        print("Using Hugging Face dataset: benmainbird/watermarking-clips")
+        dataset = HuggingFaceAudioDataset(
+            dataset_name="benmainbird/watermarking-clips",
             clip_duration=args.clip_duration,
             target_sr=args.sample_rate,
             split=args.split,
         )
+    elif args.eval_dir:
+        dataset = RandomClipDataset(
+            root_dir=args.eval_dir,
+            clip_duration=args.clip_duration,
+            target_sr=args.sample_rate,
+            split=args.split,
+        )
+
+    if dataset:
         # Use full dataset length unless num_clips is explicitly smaller
         dataset_len = len(dataset)
         if args.num_clips is not None and args.num_clips > 0 and args.num_clips < dataset_len:
@@ -201,14 +226,15 @@ def run_eval(args):
             print(f"Evaluating on {num_iters} clips (subset of {dataset_len} in '{args.split}' split)")
         else:
             num_iters = dataset_len
-            print(f"Evaluating on {num_iters} clips (full '{args.split}' split) from {dataset_dir}")
+            print(f"Evaluating on {num_iters} clips (full '{args.split}' split)")
 
     elif args.input_file:
         # Single file mode
         print(f"Evaluating on single file: {args.input_file}")
         num_iters = 1
     else:
-        raise ValueError("Must provide either --eval-dir or --input-file")
+        # Should be covered by dataset loading logic, but just in case
+        raise ValueError("Must provide either --eval-dir, --input-file, or allow HF dataset fallback")
 
     # Metrics setup
     spec_loss_cfg = SpectralLossConfig(stft_cfg=stft_cfg, sample_rate=args.sample_rate)
@@ -268,18 +294,21 @@ def run_eval(args):
         print(f"Saving {args.num_save_samples} pairs of audio samples to {save_samples_dir}")
 
     # For single file, load it once
+    wav_in_single = None
     if args.input_file:
-        wav_in, _ = load_audio(args.input_file, target_sr=args.sample_rate, mono=True)
-        wav_in = wav_in.unsqueeze(0).to(device) # (1, T)
+        wav_in_single, _ = load_audio(args.input_file, target_sr=args.sample_rate, mono=True)
+        wav_in_single = wav_in_single.unsqueeze(0).to(device) # (1, T)
     
     pbar = tqdm(range(num_iters), desc="Eval")
     
     samples_saved_count = 0
 
     for i in pbar:
-        if args.eval_dir:
+        if dataset:
             # If we are iterating sequentially
             wav_in = dataset[i].unsqueeze(0).to(device) # (1, T)
+        else:
+            wav_in = wav_in_single
         
         # Generate bits
         bits = torch.randint(0, 2, (1, args.n_bits), device=device).float()
@@ -435,6 +464,9 @@ def main():
     parser.add_argument("--output-json", type=str, default="eval_results.json", help="JSON file for metrics")
     parser.add_argument("--save-audio", action="store_true", help="Save watermarked audio (single file mode)")
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
+    
+    # New flag for HF
+    parser.add_argument("--use-hf", action="store_true", help="Force use of Hugging Face dataset")
     
     args = parser.parse_args()
     
