@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # cd /home/bmainbird/UL/sound-production/project && source venv/bin/activate
-cd /workspace/sound-production-project
+# cd /workspace/sound-production-project
 
 # Check if venv exists
 if [ ! -d "venv" ]; then
@@ -14,9 +14,12 @@ else
 fi
 
 # Move HF cache to workspace to avoid disk quota issues on home dir
-export HF_HOME="/workspace/sound-production-project/hf_cache"
+export HF_HOME="$(pwd)/hf_cache"
 export HF_DATASETS_CACHE="${HF_HOME}/datasets"
 mkdir -p "${HF_DATASETS_CACHE}"
+
+# Force HF to look in workspace for cache
+export XDG_CACHE_HOME="$(pwd)/hf_cache"
 
 # ============================================================================
 # STAGED TRAINING APPROACH
