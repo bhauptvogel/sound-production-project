@@ -1,8 +1,8 @@
 // Global State
 let currentData = [];
 let sortState = {
-    key: 'Date',
-    direction: 'desc' // 'asc' or 'desc'
+    key: 'channel',
+    direction: 'asc' // 'asc' or 'desc'
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -152,33 +152,42 @@ function executeSort() {
         let valA = a[key];
         let valB = b[key];
 
-        // Handle Dates specially if needed, but usually string comparison YYYYMMDD works
-        if (key === 'Date') {
-            // Secondary sort by Time
-            if (valA === valB) {
-                return a['Time'] < b['Time'] ? -1 * dir : 1 * dir;
-            }
-        }
+        // Primary Sort Comparison
+        let comparison = 0;
 
         // Handle numeric strings or numbers
-        // If both are numbers, subtract. If strings, localeCompare.
         const isNumA = !isNaN(parseFloat(valA)) && isFinite(valA);
         const isNumB = !isNaN(parseFloat(valB)) && isFinite(valB);
 
         if (isNumA && isNumB) {
             valA = parseFloat(valA);
             valB = parseFloat(valB);
-            return (valA - valB) * dir;
+            comparison = (valA - valB) * dir;
+        } else {
+            // Fallback to string
+            if (valA === undefined || valA === null) valA = "";
+            if (valB === undefined || valB === null) valB = "";
+            valA = String(valA).toLowerCase();
+            valB = String(valB).toLowerCase();
+
+            if (valA < valB) comparison = -1 * dir;
+            else if (valA > valB) comparison = 1 * dir;
+            else comparison = 0;
+        }
+
+        if (comparison !== 0) return comparison;
+
+        // Secondary Sort: Date + Time (Descending - Newest first)
+        // Only apply if primary key is not Date/Time
+        if (key !== 'Date' && key !== 'Time') {
+             if (a.Date !== b.Date) {
+                 return a.Date < b.Date ? 1 : -1; // Descending Date
+             }
+             if (a.Time !== b.Time) {
+                 return a.Time < b.Time ? 1 : -1; // Descending Time
+             }
         }
         
-        // Fallback to string
-        if (valA === undefined || valA === null) valA = "";
-        if (valB === undefined || valB === null) valB = "";
-        valA = String(valA).toLowerCase();
-        valB = String(valB).toLowerCase();
-
-        if (valA < valB) return -1 * dir;
-        if (valA > valB) return 1 * dir;
         return 0;
     });
 
@@ -217,17 +226,26 @@ function renderTable(data) {
         const epsCell = `<td>${row.eps}</td>`;
         const alphaCell = `<td>${row.alpha}</td>`;
         const betaCell = `<td>${row.beta}</td>`;
+        const maskRegCell = `<td>${row.mask_reg !== undefined ? row.mask_reg : '-'}</td>`;
+        const logitRegCell = `<td>${row.logit_reg !== undefined ? row.logit_reg : '-'}</td>`;
         const decLRCell = `<td>${row.decoder_lr}</td>`;
         const decStepsCell = `<td>${row.decoder_steps}</td>`;
 
         // Channel
         let channelClass = '';
+        let displayChannel = row.channel;
+        
+        // Remove suffix like _hf0, _hf1, etc.
+        if (displayChannel) {
+            displayChannel = displayChannel.replace(/_hf\d+$/, '');
+        }
+
         if (row.channel === 'none') channelClass = 'channel-none';
-        else if (row.channel === 'noise_only') channelClass = 'channel-noise';
+        else if (row.channel.startsWith('noise_only')) channelClass = 'channel-noise';
         else if (row.channel === 'full') channelClass = 'channel-full';
         else if (row.channel === 'full_hf0') channelClass = 'channel-full-hf0';
         
-        const channelCell = `<td><span class="channel-badge ${channelClass}">${row.channel}</span></td>`;
+        const channelCell = `<td><span class="channel-badge ${channelClass}">${displayChannel}</span></td>`;
 
         const epochsCell = `<td>${row.Epochs}</td>`;
         
@@ -276,7 +294,7 @@ function renderTable(data) {
             plotCell = `<td><a class="plot-link" href="${row.plot_url}" target="_self">View Plot</a></td>`;
         }
 
-        tr.innerHTML = dateCell + bitsCell + epsCell + alphaCell + betaCell + decLRCell + decStepsCell + channelCell + epochsCell + ckptCell + metricsCell + plotCell;
+        tr.innerHTML = dateCell + bitsCell + epsCell + alphaCell + betaCell + maskRegCell + logitRegCell + decLRCell + decStepsCell + channelCell + epochsCell + ckptCell + metricsCell + plotCell;
         tbody.appendChild(tr);
     });
 

@@ -1,6 +1,27 @@
 window.resultsData = [
   {
     "Date": "20251209",
+    "Time": "224948",
+    "bits": 16,
+    "eps": 0.05,
+    "alpha": 1.0,
+    "beta": 1.0,
+    "mask_reg": 0.1,
+    "logit_reg": 0.01,
+    "decoder_lr": "3e-4",
+    "decoder_steps": 0,
+    "batch_size": 32,
+    "Epochs": 10,
+    "channel": "noise_only_hf1",
+    "run_name": "20251209-224948_bits16_eps0.05_alpha1.0_beta1.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251209-224948_bits16_eps0.05_alpha1.0_beta1.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1.png",
+    "eval_exists": false,
+    "metrics": {}
+  },
+  {
+    "Date": "20251209",
     "Time": "153608",
     "bits": 16,
     "eps": 0.2,

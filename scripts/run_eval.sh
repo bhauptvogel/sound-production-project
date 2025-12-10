@@ -5,6 +5,15 @@ set -e
 DATA_DIR="clips"
 CHECKPOINT_DIR="checkpoints"  # Adjust if your checkpoints are elsewhere
 
+
+# Move HF cache to workspace to avoid disk quota issues on home dir
+export HF_HOME="$(pwd)/hf_cache"
+export HF_DATASETS_CACHE="${HF_HOME}/datasets"
+mkdir -p "${HF_DATASETS_CACHE}"
+
+# Force HF to look in workspace for cache
+export XDG_CACHE_HOME="$(pwd)/hf_cache"
+
 # Function to run evaluation for a specific pair of checkpoints
 run_evaluation_for_pair() {
     local ENC_CKPT="$1"

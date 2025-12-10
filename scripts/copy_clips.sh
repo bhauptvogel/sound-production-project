@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -lt 1 ]]; then
-  echo "Usage: $0 <ssh-port>"
+if [[ $# -lt 2 ]]; then
+  echo "Usage: $0 <remote-host> <ssh-port>"
   exit 1
 fi
 
 REMOTE_USER="root"
-REMOTE_HOST="213.173.98.107"
-REMOTE_PORT="$1"
+REMOTE_HOST="$1"
+REMOTE_PORT="$2"
 SSH_KEY="${HOME}/.ssh/id_ed25519"
 
 # Remote destination (where we want to copy TO)
