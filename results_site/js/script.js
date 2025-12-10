@@ -149,8 +149,18 @@ function executeSort() {
     const dir = sortState.direction === 'asc' ? 1 : -1;
 
     currentData.sort((a, b) => {
-        let valA = a[key];
-        let valB = b[key];
+        // Helper to get comparable value
+        const getVal = (row, k) => {
+            let val = row[k];
+            // Normalize channel for sorting (remove _hfX suffix)
+            if (k === 'channel' && val) {
+                val = val.replace(/_hf\d+$/, '');
+            }
+            return val;
+        };
+
+        let valA = getVal(a, key);
+        let valB = getVal(b, key);
 
         // Primary Sort Comparison
         let comparison = 0;
@@ -175,20 +185,29 @@ function executeSort() {
             else comparison = 0;
         }
 
-        if (comparison !== 0) return comparison;
-
-        // Secondary Sort: Date + Time (Descending - Newest first)
-        // Only apply if primary key is not Date/Time
-        if (key !== 'Date' && key !== 'Time') {
-             if (a.Date !== b.Date) {
-                 return a.Date < b.Date ? 1 : -1; // Descending Date
-             }
-             if (a.Time !== b.Time) {
-                 return a.Time < b.Time ? 1 : -1; // Descending Time
-             }
+        // Secondary Sort logic
+        if (comparison === 0) {
+            // Secondary sort is ALWAYS Date+Time Descending (Newest first)
+            // UNLESS we are explicitly sorting by Date or Time themselves
+            if (key !== 'Date' && key !== 'Time') {
+                 if (a.Date !== b.Date) {
+                     return a.Date < b.Date ? 1 : -1; // Descending Date (bigger date first)
+                 }
+                 if (a.Time !== b.Time) {
+                     return a.Time < b.Time ? 1 : -1; // Descending Time (bigger time first)
+                 }
+            } else if (key === 'Date') {
+                // If sorting by Date, tie-break with Time in same direction
+                if (a.Time !== b.Time) {
+                     let timeCmp = 0;
+                     if (a.Time < b.Time) timeCmp = -1;
+                     else if (a.Time > b.Time) timeCmp = 1;
+                     return timeCmp * dir;
+                 }
+            }
         }
         
-        return 0;
+        return comparison;
     });
 
     renderTable(currentData);
