@@ -1,5 +1,89 @@
 window.resultsData = [
   {
+    "Date": "20251211",
+    "Time": "124606",
+    "bits": 16,
+    "eps": 0.5,
+    "alpha": 0.0,
+    "beta": 0.0,
+    "mask_reg": 0.1,
+    "logit_reg": 0.01,
+    "decoder_lr": "3e-4",
+    "decoder_steps": 0,
+    "batch_size": 32,
+    "Epochs": 10,
+    "channel": "noise_only_hf1",
+    "run_name": "20251211-124606_bits16_eps0.5_alpha0.0_beta0.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251211-124606_bits16_eps0.5_alpha0.0_beta0.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1.png",
+    "eval_exists": false,
+    "metrics": {}
+  },
+  {
+    "Date": "20251211",
+    "Time": "102617",
+    "bits": 16,
+    "eps": 0.5,
+    "alpha": 0.1,
+    "beta": 0.1,
+    "mask_reg": 0.1,
+    "logit_reg": 0.01,
+    "decoder_lr": "3e-4",
+    "decoder_steps": 0,
+    "batch_size": 32,
+    "Epochs": 10,
+    "channel": "noise_only_hf1",
+    "run_name": "20251211-102617_bits16_eps0.5_alpha0.1_beta0.1_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251211-102617_bits16_eps0.5_alpha0.1_beta0.1_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1.png",
+    "eval_exists": false,
+    "metrics": {}
+  },
+  {
+    "Date": "20251210",
+    "Time": "233808",
+    "bits": 16,
+    "eps": 0.4,
+    "alpha": 0.0,
+    "beta": 0.0,
+    "mask_reg": 0.1,
+    "logit_reg": 0.01,
+    "decoder_lr": "3e-4",
+    "decoder_steps": 0,
+    "batch_size": 32,
+    "Epochs": 10,
+    "channel": "noise_only_hf1",
+    "run_name": "20251210-233808_bits16_eps0.4_alpha0.0_beta0.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251210-233808_bits16_eps0.4_alpha0.0_beta0.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1.png",
+    "eval_exists": false,
+    "metrics": {}
+  },
+  {
+    "Date": "20251210",
+    "Time": "211954",
+    "bits": 16,
+    "eps": 0.3,
+    "alpha": 0.0,
+    "beta": 0.0,
+    "mask_reg": 0.1,
+    "logit_reg": 0.01,
+    "decoder_lr": "3e-4",
+    "decoder_steps": 0,
+    "batch_size": 32,
+    "Epochs": 10,
+    "channel": "noise_only_hf1",
+    "run_name": "20251210-211954_bits16_eps0.3_alpha0.0_beta0.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251210-211954_bits16_eps0.3_alpha0.0_beta0.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1.png",
+    "eval_exists": false,
+    "metrics": {}
+  },
+  {
     "Date": "20251210",
     "Time": "151800",
     "bits": 16,
@@ -80,54 +164,8 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251209-153608_bits16_eps0.2_alpha0.1_beta0.1_mask0.01_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chfull_hf0.png",
-    "eval_exists": true,
-    "metrics": {
-      "Identity": {
-        "ber": 0.2565,
-        "snr": 16.4,
-        "lsd": 0.009
-      },
-      "Noise (std=0.01)": {
-        "ber": 0.4111,
-        "snr": 16.4,
-        "lsd": 0.009
-      },
-      "Resample (0.9x)": {
-        "ber": 0.5018,
-        "snr": 16.4,
-        "lsd": 0.009
-      },
-      "Resample (1.1x)": {
-        "ber": 0.5007,
-        "snr": 16.4,
-        "lsd": 0.009
-      },
-      "MP3 (128k)": {
-        "ber": 0.3434,
-        "snr": 16.4,
-        "lsd": 0.009
-      },
-      "MP3 (64k)": {
-        "ber": 0.3814,
-        "snr": 16.4,
-        "lsd": 0.009
-      },
-      "AAC (128k)": {
-        "ber": 0.3441,
-        "snr": 16.4,
-        "lsd": 0.009
-      },
-      "Quant (12-bit)": {
-        "ber": 0.3087,
-        "snr": 16.4,
-        "lsd": 0.009
-      },
-      "Random EQ": {
-        "ber": 0.2892,
-        "snr": 16.4,
-        "lsd": 0.009
-      }
-    }
+    "eval_exists": false,
+    "metrics": {}
   },
   {
     "Date": "20251201",
@@ -147,54 +185,8 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251201-164410_bits16_eps0.2_alpha0.0_beta0.0_mask0.0_logit0.0_decLR3e-4_decSteps0_bs32_ep20_chnoise_only.png",
-    "eval_exists": true,
-    "metrics": {
-      "Identity": {
-        "ber": 0.1682,
-        "snr": 15.42,
-        "lsd": 0.035
-      },
-      "Noise (std=0.01)": {
-        "ber": 0.3302,
-        "snr": 15.42,
-        "lsd": 0.035
-      },
-      "Resample (0.9x)": {
-        "ber": 0.391,
-        "snr": 15.42,
-        "lsd": 0.035
-      },
-      "Resample (1.1x)": {
-        "ber": 0.4277,
-        "snr": 15.42,
-        "lsd": 0.035
-      },
-      "MP3 (128k)": {
-        "ber": 0.2646,
-        "snr": 15.42,
-        "lsd": 0.035
-      },
-      "MP3 (64k)": {
-        "ber": 0.3079,
-        "snr": 15.42,
-        "lsd": 0.035
-      },
-      "AAC (128k)": {
-        "ber": 0.2417,
-        "snr": 15.42,
-        "lsd": 0.035
-      },
-      "Quant (12-bit)": {
-        "ber": 0.23,
-        "snr": 15.42,
-        "lsd": 0.035
-      },
-      "Random EQ": {
-        "ber": 0.316,
-        "snr": 15.42,
-        "lsd": 0.035
-      }
-    }
+    "eval_exists": false,
+    "metrics": {}
   },
   {
     "Date": "20251201",
@@ -217,49 +209,49 @@ window.resultsData = [
     "eval_exists": true,
     "metrics": {
       "Identity": {
-        "ber": 0.1915,
-        "snr": 18.35,
-        "lsd": 0.019
+        "ber": 0.193,
+        "snr": 18.34,
+        "lsd": 0.018
       },
       "Noise (std=0.01)": {
-        "ber": 0.3688,
-        "snr": 18.35,
-        "lsd": 0.019
+        "ber": 0.3694,
+        "snr": 18.34,
+        "lsd": 0.018
       },
       "Resample (0.9x)": {
-        "ber": 0.4492,
-        "snr": 18.35,
-        "lsd": 0.019
+        "ber": 0.4531,
+        "snr": 18.34,
+        "lsd": 0.018
       },
       "Resample (1.1x)": {
-        "ber": 0.4593,
-        "snr": 18.35,
-        "lsd": 0.019
+        "ber": 0.4555,
+        "snr": 18.34,
+        "lsd": 0.018
       },
       "MP3 (128k)": {
-        "ber": 0.2709,
-        "snr": 18.35,
-        "lsd": 0.019
+        "ber": 0.2716,
+        "snr": 18.34,
+        "lsd": 0.018
       },
       "MP3 (64k)": {
-        "ber": 0.3254,
-        "snr": 18.35,
-        "lsd": 0.019
+        "ber": 0.3261,
+        "snr": 18.34,
+        "lsd": 0.018
       },
       "AAC (128k)": {
-        "ber": 0.2588,
-        "snr": 18.35,
-        "lsd": 0.019
+        "ber": 0.2611,
+        "snr": 18.34,
+        "lsd": 0.018
       },
       "Quant (12-bit)": {
-        "ber": 0.2569,
-        "snr": 18.35,
-        "lsd": 0.019
+        "ber": 0.2576,
+        "snr": 18.34,
+        "lsd": 0.018
       },
       "Random EQ": {
-        "ber": 0.2905,
-        "snr": 18.35,
-        "lsd": 0.019
+        "ber": 0.294,
+        "snr": 18.34,
+        "lsd": 0.018
       }
     }
   },
@@ -284,48 +276,48 @@ window.resultsData = [
     "eval_exists": true,
     "metrics": {
       "Identity": {
-        "ber": 0.273,
-        "snr": 23.18,
+        "ber": 0.2704,
+        "snr": 23.2,
         "lsd": 0.009
       },
       "Noise (std=0.01)": {
-        "ber": 0.3869,
-        "snr": 23.18,
+        "ber": 0.3883,
+        "snr": 23.2,
         "lsd": 0.009
       },
       "Resample (0.9x)": {
-        "ber": 0.4122,
-        "snr": 23.18,
+        "ber": 0.4155,
+        "snr": 23.2,
         "lsd": 0.009
       },
       "Resample (1.1x)": {
-        "ber": 0.4633,
-        "snr": 23.18,
+        "ber": 0.4649,
+        "snr": 23.2,
         "lsd": 0.009
       },
       "MP3 (128k)": {
-        "ber": 0.3653,
-        "snr": 23.18,
+        "ber": 0.3644,
+        "snr": 23.2,
         "lsd": 0.009
       },
       "MP3 (64k)": {
-        "ber": 0.3773,
-        "snr": 23.18,
+        "ber": 0.3737,
+        "snr": 23.2,
         "lsd": 0.009
       },
       "AAC (128k)": {
-        "ber": 0.31,
-        "snr": 23.18,
+        "ber": 0.308,
+        "snr": 23.2,
         "lsd": 0.009
       },
       "Quant (12-bit)": {
-        "ber": 0.3055,
-        "snr": 23.18,
+        "ber": 0.3053,
+        "snr": 23.2,
         "lsd": 0.009
       },
       "Random EQ": {
-        "ber": 0.4071,
-        "snr": 23.18,
+        "ber": 0.4075,
+        "snr": 23.2,
         "lsd": 0.009
       }
     }
@@ -351,49 +343,49 @@ window.resultsData = [
     "eval_exists": true,
     "metrics": {
       "Identity": {
-        "ber": 0.116,
-        "snr": 12.67,
-        "lsd": 0.047
+        "ber": 0.1143,
+        "snr": 12.7,
+        "lsd": 0.046
       },
       "Noise (std=0.01)": {
-        "ber": 0.3352,
-        "snr": 12.67,
-        "lsd": 0.047
+        "ber": 0.336,
+        "snr": 12.7,
+        "lsd": 0.046
       },
       "Resample (0.9x)": {
-        "ber": 0.4439,
-        "snr": 12.67,
-        "lsd": 0.047
+        "ber": 0.4437,
+        "snr": 12.7,
+        "lsd": 0.046
       },
       "Resample (1.1x)": {
-        "ber": 0.4573,
-        "snr": 12.67,
-        "lsd": 0.047
+        "ber": 0.4594,
+        "snr": 12.7,
+        "lsd": 0.046
       },
       "MP3 (128k)": {
-        "ber": 0.212,
-        "snr": 12.67,
-        "lsd": 0.047
+        "ber": 0.2105,
+        "snr": 12.7,
+        "lsd": 0.046
       },
       "MP3 (64k)": {
-        "ber": 0.2702,
-        "snr": 12.67,
-        "lsd": 0.047
+        "ber": 0.2697,
+        "snr": 12.7,
+        "lsd": 0.046
       },
       "AAC (128k)": {
-        "ber": 0.1912,
-        "snr": 12.67,
-        "lsd": 0.047
+        "ber": 0.1905,
+        "snr": 12.7,
+        "lsd": 0.046
       },
       "Quant (12-bit)": {
-        "ber": 0.186,
-        "snr": 12.67,
-        "lsd": 0.047
+        "ber": 0.1863,
+        "snr": 12.7,
+        "lsd": 0.046
       },
       "Random EQ": {
-        "ber": 0.223,
-        "snr": 12.67,
-        "lsd": 0.047
+        "ber": 0.2173,
+        "snr": 12.7,
+        "lsd": 0.046
       }
     }
   },
@@ -418,48 +410,48 @@ window.resultsData = [
     "eval_exists": true,
     "metrics": {
       "Identity": {
-        "ber": 0.1767,
-        "snr": 16.55,
+        "ber": 0.1768,
+        "snr": 16.56,
         "lsd": 0.022
       },
       "Noise (std=0.01)": {
-        "ber": 0.35,
-        "snr": 16.55,
+        "ber": 0.346,
+        "snr": 16.56,
         "lsd": 0.022
       },
       "Resample (0.9x)": {
-        "ber": 0.4196,
-        "snr": 16.55,
+        "ber": 0.4251,
+        "snr": 16.56,
         "lsd": 0.022
       },
       "Resample (1.1x)": {
-        "ber": 0.4511,
-        "snr": 16.55,
+        "ber": 0.4505,
+        "snr": 16.56,
         "lsd": 0.022
       },
       "MP3 (128k)": {
-        "ber": 0.249,
-        "snr": 16.55,
+        "ber": 0.2453,
+        "snr": 16.56,
         "lsd": 0.022
       },
       "MP3 (64k)": {
-        "ber": 0.3001,
-        "snr": 16.55,
+        "ber": 0.2981,
+        "snr": 16.56,
         "lsd": 0.022
       },
       "AAC (128k)": {
-        "ber": 0.225,
-        "snr": 16.55,
+        "ber": 0.2216,
+        "snr": 16.56,
         "lsd": 0.022
       },
       "Quant (12-bit)": {
-        "ber": 0.2324,
-        "snr": 16.55,
+        "ber": 0.2342,
+        "snr": 16.56,
         "lsd": 0.022
       },
       "Random EQ": {
-        "ber": 0.3101,
-        "snr": 16.55,
+        "ber": 0.3085,
+        "snr": 16.56,
         "lsd": 0.022
       }
     }
@@ -485,48 +477,48 @@ window.resultsData = [
     "eval_exists": true,
     "metrics": {
       "Identity": {
-        "ber": 0.3024,
-        "snr": 30.61,
+        "ber": 0.2981,
+        "snr": 30.6,
         "lsd": 0.007
       },
       "Noise (std=0.01)": {
-        "ber": 0.4108,
-        "snr": 30.61,
+        "ber": 0.4045,
+        "snr": 30.6,
         "lsd": 0.007
       },
       "Resample (0.9x)": {
-        "ber": 0.4377,
-        "snr": 30.61,
+        "ber": 0.4399,
+        "snr": 30.6,
         "lsd": 0.007
       },
       "Resample (1.1x)": {
-        "ber": 0.4653,
-        "snr": 30.61,
+        "ber": 0.4618,
+        "snr": 30.6,
         "lsd": 0.007
       },
       "MP3 (128k)": {
-        "ber": 0.3574,
-        "snr": 30.61,
+        "ber": 0.356,
+        "snr": 30.6,
         "lsd": 0.007
       },
       "MP3 (64k)": {
-        "ber": 0.3832,
-        "snr": 30.61,
+        "ber": 0.3783,
+        "snr": 30.6,
         "lsd": 0.007
       },
       "AAC (128k)": {
-        "ber": 0.336,
-        "snr": 30.61,
+        "ber": 0.3308,
+        "snr": 30.6,
         "lsd": 0.007
       },
       "Quant (12-bit)": {
-        "ber": 0.3389,
-        "snr": 30.61,
+        "ber": 0.3309,
+        "snr": 30.6,
         "lsd": 0.007
       },
       "Random EQ": {
-        "ber": 0.4114,
-        "snr": 30.61,
+        "ber": 0.4025,
+        "snr": 30.6,
         "lsd": 0.007
       }
     }
@@ -552,48 +544,48 @@ window.resultsData = [
     "eval_exists": true,
     "metrics": {
       "Identity": {
-        "ber": 0.2047,
-        "snr": 15.81,
+        "ber": 0.2051,
+        "snr": 15.84,
         "lsd": 0.031
       },
       "Noise (std=0.01)": {
-        "ber": 0.4322,
-        "snr": 15.81,
+        "ber": 0.4282,
+        "snr": 15.84,
         "lsd": 0.031
       },
       "Resample (0.9x)": {
-        "ber": 0.5003,
-        "snr": 15.81,
+        "ber": 0.4972,
+        "snr": 15.84,
         "lsd": 0.031
       },
       "Resample (1.1x)": {
-        "ber": 0.5004,
-        "snr": 15.81,
+        "ber": 0.4989,
+        "snr": 15.84,
         "lsd": 0.031
       },
       "MP3 (128k)": {
-        "ber": 0.2991,
-        "snr": 15.81,
+        "ber": 0.2983,
+        "snr": 15.84,
         "lsd": 0.031
       },
       "MP3 (64k)": {
-        "ber": 0.3557,
-        "snr": 15.81,
+        "ber": 0.355,
+        "snr": 15.84,
         "lsd": 0.031
       },
       "AAC (128k)": {
-        "ber": 0.29,
-        "snr": 15.81,
+        "ber": 0.2901,
+        "snr": 15.84,
         "lsd": 0.031
       },
       "Quant (12-bit)": {
-        "ber": 0.2871,
-        "snr": 15.81,
+        "ber": 0.2863,
+        "snr": 15.84,
         "lsd": 0.031
       },
       "Random EQ": {
-        "ber": 0.2525,
-        "snr": 15.81,
+        "ber": 0.2544,
+        "snr": 15.84,
         "lsd": 0.031
       }
     }

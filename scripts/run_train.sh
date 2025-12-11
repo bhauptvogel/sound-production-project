@@ -46,16 +46,16 @@ export XDG_CACHE_HOME="$(pwd)/hf_cache"
 
 # Default configuration
 DATA_DIR="clips/"
-EPOCHS=10
+EPOCHS=20
 BATCH=32
 NUM_BITS=16
-EPS=0.4
-ALPHA=0.0
-BETA=0.0
-MASK_REG=0.1
-LOGIT_REG=0.01
-DECODER_LR=3e-4
-DECODER_STEPS=0
+EPS=0.3
+ALPHA=0.2
+BETA=0.2
+MASK_REG=1e-4
+LOGIT_REG=1e-4
+DECODER_LR=1e-4
+DECODER_STEPS=1
 SAVE_PT=1 # 1 = save checkpoints, 0 = don't save
 CHANNEL_MODE="noise_only" # default stage
 USE_HF=1 # 0 = auto-detect, 1 = force HF

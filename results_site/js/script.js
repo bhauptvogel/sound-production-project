@@ -4,6 +4,7 @@ let sortState = {
     key: 'channel',
     direction: 'asc' // 'asc' or 'desc'
 };
+let myChart = null; // Chart.js instance
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Script loaded');
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Initialize
         populateFilters(window.allData);
+        populateMetricOptions(window.allData);
         applyFilters(); // This will also sort and render
     } else {
         console.error('No data found in window.resultsData. Check data.js loading.');
@@ -60,6 +62,31 @@ function populateSelect(id, values) {
         const option = document.createElement('option');
         option.value = val;
         option.textContent = val;
+        select.appendChild(option);
+    });
+}
+
+function populateMetricOptions(data) {
+    const select = document.getElementById('metric-select');
+    const availableMetrics = new Set();
+    
+    // Scan all data to find all possible metric keys
+    data.forEach(row => {
+        if (row.metrics) {
+            Object.keys(row.metrics).forEach(attack => {
+                // For each attack, we have sub-metrics like ber, snr, lsd
+                ['BER', 'SNR', 'LSD'].forEach(sub => {
+                    availableMetrics.add(`${attack} ${sub}`);
+                });
+            });
+        }
+    });
+    
+    // Sort and add to select
+    Array.from(availableMetrics).sort().forEach(m => {
+        const option = document.createElement('option');
+        option.value = m;
+        option.textContent = m;
         select.appendChild(option);
     });
 }
@@ -329,5 +356,148 @@ function toggleStats(btn) {
     } else {
         content.style.display = "none";
         btn.textContent = "Show Evaluation Stats";
+    }
+}
+
+// --- Chart Generation ---
+function generateChart() {
+    const metricSelect = document.getElementById('metric-select');
+    const metricKey = metricSelect.value;
+    
+    if (!metricKey) {
+        alert('Please select a metric first.');
+        return;
+    }
+
+    // Filter to only entries with evaluation stats
+    const dataForChart = currentData.filter(row => row.eval_exists === true);
+
+    if (dataForChart.length === 0) {
+        alert('No data with evaluation stats found in current selection.');
+        return;
+    }
+
+    const xAxisSelect = document.getElementById('xaxis-select');
+    const xAxisKey = xAxisSelect.value; // "" (Date-Time) or "eps", "beta", etc.
+
+    // metricKey is something like "Identity SNR" or "Quantization BER"
+    const lastSpaceIndex = metricKey.lastIndexOf(' ');
+    const attackName = metricKey.substring(0, lastSpaceIndex);
+    const subMetric = metricKey.substring(lastSpaceIndex + 1);
+    const metricKeyLower = subMetric.toLowerCase();
+
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+    const chartWrapper = document.querySelector('.chart-wrapper');
+    const hideBtn = document.getElementById('hide-chart-btn');
+    
+    chartWrapper.style.display = 'block';
+    hideBtn.style.display = 'inline-block';
+
+    if (myChart) {
+        myChart.destroy();
+    }
+
+    // Generate Labels (X-Axis)
+    const labels = dataForChart.map(row => {
+        if (xAxisKey) {
+            // Use selected parameter
+            let val = row[xAxisKey];
+            if (val === undefined || val === null) return 'N/A';
+            return val;
+        } else {
+            // Default: Date-Time
+            return `${row.Date}-${row.Time}`;
+        }
+    });
+
+    const values = dataForChart.map(row => {
+        if (row.metrics && row.metrics[attackName]) {
+            const val = row.metrics[attackName][metricKeyLower];
+            return val !== undefined && val !== null ? val : null;
+        }
+        return null;
+    });
+
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels, // These are equidistant labels, preserving order of dataForChart
+            datasets: [{
+                label: metricKey,
+                data: values,
+                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                borderColor: 'rgba(0, 123, 255, 1)',
+                borderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: subMetric
+                    }
+                },
+                x: {
+                    ticks: {
+                        autoSkip: true,
+                        maxRotation: 45,
+                        minRotation: 0
+                    },
+                    title: {
+                        display: true,
+                        text: xAxisKey ? xAxisSelect.options[xAxisSelect.selectedIndex].text : 'Runs (Sorted)'
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: (context) => {
+                             const idx = context[0].dataIndex;
+                             const row = dataForChart[idx];
+                             return row.run_name;
+                        },
+                        label: (context) => {
+                             const val = context.raw !== null ? context.raw : 'N/A';
+                             return `${metricKey}: ${val}`;
+                        },
+                        afterLabel: (context) => {
+                            const idx = context[0].dataIndex;
+                            const row = dataForChart[idx];
+                            return [
+                                `Channel: ${row.channel}`,
+                                `Bits: ${row.bits}, Eps: ${row.eps}`,
+                                `Alpha: ${row.alpha}, Beta: ${row.beta}`,
+                                `MaskReg: ${row.mask_reg}, LogitReg: ${row.logit_reg}`
+                            ];
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+}
+
+function hideChart() {
+    const chartWrapper = document.querySelector('.chart-wrapper');
+    const hideBtn = document.getElementById('hide-chart-btn');
+    
+    chartWrapper.style.display = 'none';
+    hideBtn.style.display = 'none';
+    
+    if (myChart) {
+        myChart.destroy();
+        myChart = null;
     }
 }

@@ -2,7 +2,7 @@
 set -e
 
 # Configuration
-DATA_DIR="clips"
+# DATA_DIR="clips"
 CHECKPOINT_DIR="checkpoints"  # Adjust if your checkpoints are elsewhere
 
 
@@ -48,16 +48,19 @@ run_evaluation_for_pair() {
     local EPS=0.02
 
     # Attempt to parse bits
-    if [[ $ENC_CKPT =~ bits([0-9]+) ]]; then
+    # Use basename to avoid directory confusing regex if it contained "bits" string
+    local CKPT_NAME=$(basename "$ENC_CKPT")
+    
+    if [[ $CKPT_NAME =~ bits([0-9]+) ]]; then
         N_BITS=${BASH_REMATCH[1]}
-        echo "Detected n-bits from filename: $N_BITS"
     fi
+    echo "Detected n-bits from filename: $N_BITS"
 
     # Attempt to parse eps
-    if [[ $ENC_CKPT =~ eps([0-9.]+) ]]; then
+    if [[ $CKPT_NAME =~ eps([0-9.]+) ]]; then
         EPS=${BASH_REMATCH[1]}
-        echo "Detected eps from filename: $EPS"
     fi
+    echo "Detected eps from filename: $EPS"
 
     # Create output directory
     mkdir -p "$OUTPUT_DIR"
@@ -67,8 +70,8 @@ run_evaluation_for_pair() {
     venv/bin/python -m watermarking.eval \
         --encoder-ckpt "$ENC_CKPT" \
         --decoder-ckpt "$DEC_CKPT" \
-        --eval-dir "$DATA_DIR" \
         --split "val" \
+        --use-hf \
         --n-bits "$N_BITS" \
         --eps "$EPS" \
         --test-all \

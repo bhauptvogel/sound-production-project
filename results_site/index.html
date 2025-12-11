@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neural Audio Watermarking Results</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -17,6 +18,12 @@
             <div class="filter-group">
                 <label for="search-text">Search</label>
                 <input type="text" id="search-text" placeholder="Run name, ID..." oninput="applyFilters()">
+            </div>
+            <div class="filter-group">
+                <label for="filter-channel">Channel</label>
+                <select id="filter-channel" onchange="applyFilters()">
+                    <option value="all">All</option>
+                </select>
             </div>
             <div class="filter-group">
                 <label for="filter-bits">Bits</label>
@@ -55,12 +62,6 @@
                 </select>
             </div>
             <div class="filter-group">
-                <label for="filter-channel">Channel</label>
-                <select id="filter-channel" onchange="applyFilters()">
-                    <option value="all">All</option>
-                </select>
-            </div>
-            <div class="filter-group">
                 <label for="filter-epochs">Epochs</label>
                 <select id="filter-epochs" onchange="applyFilters()">
                     <option value="all">All</option>
@@ -76,6 +77,39 @@
             </div>
             <div class="filter-actions">
                 <button class="btn-secondary" onclick="resetFilters()">Reset</button>
+            </div>
+        </div>
+
+        <!-- Plotting Section -->
+        <div class="plotting-container">
+            <div class="plotting-controls">
+                <h3>Compare Metrics</h3>
+                <div class="plotting-input">
+                    <label for="metric-select">Select Metric:</label>
+                    <select id="metric-select">
+                        <option value="">-- Select a Metric --</option>
+                    </select>
+                    
+                    <label for="xaxis-select">X-Axis:</label>
+                    <select id="xaxis-select">
+                        <option value="">Date-Time</option>
+                        <option value="bits">Bits</option>
+                        <option value="eps">Epsilon</option>
+                        <option value="alpha">Alpha</option>
+                        <option value="beta">Beta</option>
+                        <option value="mask_reg">Mask Reg</option>
+                        <option value="logit_reg">Logit Reg</option>
+                        <option value="decoder_lr">Dec LR</option>
+                        <option value="decoder_steps">Dec Steps</option>
+                        <option value="Epochs">Epochs</option>
+                    </select>
+
+                    <button class="btn-primary" onclick="generateChart()">Create Plot</button>
+                    <button class="btn-secondary" onclick="hideChart()" id="hide-chart-btn" style="display:none;">Hide Plot</button>
+                </div>
+            </div>
+            <div class="chart-wrapper" style="display:none; position: relative; height:400px; width:100%">
+                <canvas id="comparisonChart"></canvas>
             </div>
         </div>
 
