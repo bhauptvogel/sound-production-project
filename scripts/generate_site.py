@@ -5,6 +5,7 @@ import json
 import re
 import shutil
 import argparse
+import pandas as pd
 
 def parse_filename(filename):
     # 20251126-234814_bits16_eps0.2_alpha0.0_beta0.0_mask0.0_logit0.0_decLR5e-4_decSteps0_bs32_ep10_chnone.txt
@@ -110,6 +111,58 @@ def main():
         f.write(f"window.resultsData = {json_str};")
     
     print(f"Generated site data at {output_js} with {len(data)} entries.")
+
+    # CSV Generation
+    csv_data = []
+    
+    # Collect all unique attack names first to ensure consistent columns
+    all_attack_names = set()
+    for row in data:
+        if row.get("eval_exists") and row.get("metrics"):
+            all_attack_names.update(row["metrics"].keys())
+    
+    sorted_attack_names = sorted(list(all_attack_names))
+
+    for row in data:
+        if not row.get("eval_exists"):
+            continue
+            
+        csv_row = {
+            "date": row["Date"],
+            "time": row["Time"],
+            "n-bits": row["bits"],
+            "eps": row["eps"],
+            "alpha": row["alpha"],
+            "mask_reg": row["mask_reg"],
+            "logit_reg": row["logit_reg"],
+            "decoder_steps": row["decoder_steps"],
+            "decoder_lr": row["decoder_lr"],
+            "batch_size": row["batch_size"],
+            "epochs": row["Epochs"],
+            "channel": row["channel"],
+            "plot_url": row["plot_url"] if row["plot_url"] else ""
+        }
+        
+        # Add metrics
+        if row.get("metrics"):
+            for attack in sorted_attack_names:
+                # Clean attack name for column header (lowercase, spaces to underscores)
+                clean_attack = attack.lower().replace(" ", "_").replace("-", "_")
+                
+                scores = row["metrics"].get(attack, {})
+                csv_row[f"eval_ber_{clean_attack}"] = scores.get("ber", "")
+                csv_row[f"eval_snr_{clean_attack}"] = scores.get("snr", "")
+                csv_row[f"eval_lsd_{clean_attack}"] = scores.get("lsd", "")
+        
+        csv_data.append(csv_row)
+
+    if csv_data:
+        df = pd.DataFrame(csv_data)
+        output_csv = os.path.join(site_dir, "data.csv")
+        df.to_csv(output_csv, index=False)
+        print(f"Generated CSV data at {output_csv} with {len(csv_data)} entries.")
+    else:
+        print("No evaluation data found, skipping CSV generation.")
 
 if __name__ == "__main__":
     main()

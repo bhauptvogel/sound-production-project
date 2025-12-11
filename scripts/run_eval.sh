@@ -81,6 +81,19 @@ run_evaluation_for_pair() {
 
     echo "Evaluation complete for $ENC_STAMP"
     echo "---------------------------------------------------"
+
+    # Check for CPU usage and cool down
+    # Check if nvidia-smi command exists and if it shows any GPUs
+    if command -v nvidia-smi &> /dev/null; then
+        GPU_COUNT=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
+        if [ "$GPU_COUNT" -gt 0 ]; then
+            echo "GPU detected. Skipping cooldown."
+            return 0
+        fi
+    fi
+
+    echo "Running on CPU (or GPU check failed). Cooling down for 5 minutes..."
+    sleep 300
 }
 
 # Argument handling
