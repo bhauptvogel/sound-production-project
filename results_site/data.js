@@ -1,6 +1,27 @@
 window.resultsData = [
   {
     "Date": "20251212",
+    "Time": "182237",
+    "bits": 16,
+    "eps": 0.3,
+    "alpha": 0.2,
+    "beta": 0.2,
+    "mask_reg": 0.0001,
+    "logit_reg": 0.0001,
+    "decoder_lr": "1e-4",
+    "decoder_steps": 2,
+    "batch_size": 32,
+    "Epochs": 20,
+    "channel": "noise_only_hf1",
+    "run_name": "20251212-182237_bits16_eps0.3_alpha0.2_beta0.2_mask1e-4_logit1e-4_decLR1e-4_decSteps2_bs32_ep20_chnoise_only_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251212-182237_bits16_eps0.3_alpha0.2_beta0.2_mask1e-4_logit1e-4_decLR1e-4_decSteps2_bs32_ep20_chnoise_only_hf1.png",
+    "eval_exists": false,
+    "metrics": {}
+  },
+  {
+    "Date": "20251212",
     "Time": "095901",
     "bits": 16,
     "eps": 0.3,
@@ -17,8 +38,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251212-095901_bits16_eps0.3_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep30_chnoise_only_hf1.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.117,
+        "snr": 12.49,
+        "lsd": 0.049
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.3149,
+        "snr": 12.49,
+        "lsd": 0.049
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4272,
+        "snr": 12.49,
+        "lsd": 0.049
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4443,
+        "snr": 12.49,
+        "lsd": 0.049
+      },
+      "MP3 (128k)": {
+        "ber": 0.1981,
+        "snr": 12.49,
+        "lsd": 0.049
+      },
+      "MP3 (64k)": {
+        "ber": 0.2688,
+        "snr": 12.49,
+        "lsd": 0.049
+      },
+      "AAC (128k)": {
+        "ber": 0.1821,
+        "snr": 12.49,
+        "lsd": 0.049
+      },
+      "Quant (12-bit)": {
+        "ber": 0.1823,
+        "snr": 12.49,
+        "lsd": 0.049
+      },
+      "Random EQ": {
+        "ber": 0.246,
+        "snr": 12.49,
+        "lsd": 0.049
+      }
+    }
   },
   {
     "Date": "20251212",
@@ -38,8 +105,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251212-042158_bits16_eps0.3_alpha0.2_beta0.2_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnoise_only_hf1.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.1605,
+        "snr": 20.5,
+        "lsd": 0.017
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.3398,
+        "snr": 20.5,
+        "lsd": 0.017
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4505,
+        "snr": 20.5,
+        "lsd": 0.017
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4599,
+        "snr": 20.5,
+        "lsd": 0.017
+      },
+      "MP3 (128k)": {
+        "ber": 0.2421,
+        "snr": 20.5,
+        "lsd": 0.017
+      },
+      "MP3 (64k)": {
+        "ber": 0.2997,
+        "snr": 20.5,
+        "lsd": 0.017
+      },
+      "AAC (128k)": {
+        "ber": 0.2327,
+        "snr": 20.5,
+        "lsd": 0.017
+      },
+      "Quant (12-bit)": {
+        "ber": 0.2239,
+        "snr": 20.5,
+        "lsd": 0.017
+      },
+      "Random EQ": {
+        "ber": 0.2483,
+        "snr": 20.5,
+        "lsd": 0.017
+      }
+    }
   },
   {
     "Date": "20251211",
@@ -59,8 +172,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251211-224523_bits16_eps0.4_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnoise_only_hf1.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.0944,
+        "snr": 10.49,
+        "lsd": 0.056
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.294,
+        "snr": 10.49,
+        "lsd": 0.056
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4251,
+        "snr": 10.49,
+        "lsd": 0.056
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4379,
+        "snr": 10.49,
+        "lsd": 0.056
+      },
+      "MP3 (128k)": {
+        "ber": 0.1798,
+        "snr": 10.49,
+        "lsd": 0.056
+      },
+      "MP3 (64k)": {
+        "ber": 0.2565,
+        "snr": 10.49,
+        "lsd": 0.056
+      },
+      "AAC (128k)": {
+        "ber": 0.1574,
+        "snr": 10.49,
+        "lsd": 0.056
+      },
+      "Quant (12-bit)": {
+        "ber": 0.1608,
+        "snr": 10.49,
+        "lsd": 0.056
+      },
+      "Random EQ": {
+        "ber": 0.2128,
+        "snr": 10.49,
+        "lsd": 0.056
+      }
+    }
   },
   {
     "Date": "20251211",
