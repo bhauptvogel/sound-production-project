@@ -17,8 +17,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251212-182237_bits16_eps0.3_alpha0.2_beta0.2_mask1e-4_logit1e-4_decLR1e-4_decSteps2_bs32_ep20_chnoise_only_hf1.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.1442,
+        "snr": 17.04,
+        "lsd": 0.023
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.3097,
+        "snr": 17.04,
+        "lsd": 0.023
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4132,
+        "snr": 17.04,
+        "lsd": 0.023
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4298,
+        "snr": 17.04,
+        "lsd": 0.023
+      },
+      "MP3 (128k)": {
+        "ber": 0.2297,
+        "snr": 17.04,
+        "lsd": 0.023
+      },
+      "MP3 (64k)": {
+        "ber": 0.2904,
+        "snr": 17.04,
+        "lsd": 0.023
+      },
+      "AAC (128k)": {
+        "ber": 0.2052,
+        "snr": 17.04,
+        "lsd": 0.023
+      },
+      "Quant (12-bit)": {
+        "ber": 0.201,
+        "snr": 17.04,
+        "lsd": 0.023
+      },
+      "Random EQ": {
+        "ber": 0.2767,
+        "snr": 17.04,
+        "lsd": 0.023
+      }
+    }
   },
   {
     "Date": "20251212",
