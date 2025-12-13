@@ -92,8 +92,8 @@ run_evaluation_for_pair() {
         fi
     fi
 
-    echo "Running on CPU (or GPU check failed). Cooling down for 5 minutes..."
-    sleep 300
+    echo "Running on CPU (or GPU check failed). Cooling down for 10 minutes..."
+    sleep 600
 }
 
 # Argument handling

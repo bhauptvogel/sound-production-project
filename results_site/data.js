@@ -1,5 +1,135 @@
 window.resultsData = [
   {
+    "Date": "20251212",
+    "Time": "095901",
+    "bits": 16,
+    "eps": 0.3,
+    "alpha": 0.0,
+    "beta": 0.0,
+    "mask_reg": 0.0001,
+    "logit_reg": 0.0001,
+    "decoder_lr": "1e-4",
+    "decoder_steps": 1,
+    "batch_size": 32,
+    "Epochs": 30,
+    "channel": "noise_only_hf1",
+    "run_name": "20251212-095901_bits16_eps0.3_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep30_chnoise_only_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251212-095901_bits16_eps0.3_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep30_chnoise_only_hf1.png",
+    "eval_exists": false,
+    "metrics": {}
+  },
+  {
+    "Date": "20251212",
+    "Time": "042158",
+    "bits": 16,
+    "eps": 0.3,
+    "alpha": 0.2,
+    "beta": 0.2,
+    "mask_reg": 0.0001,
+    "logit_reg": 0.0001,
+    "decoder_lr": "1e-4",
+    "decoder_steps": 1,
+    "batch_size": 32,
+    "Epochs": 20,
+    "channel": "noise_only_hf1",
+    "run_name": "20251212-042158_bits16_eps0.3_alpha0.2_beta0.2_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnoise_only_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251212-042158_bits16_eps0.3_alpha0.2_beta0.2_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnoise_only_hf1.png",
+    "eval_exists": false,
+    "metrics": {}
+  },
+  {
+    "Date": "20251211",
+    "Time": "224523",
+    "bits": 16,
+    "eps": 0.4,
+    "alpha": 0.0,
+    "beta": 0.0,
+    "mask_reg": 0.0001,
+    "logit_reg": 0.0001,
+    "decoder_lr": "1e-4",
+    "decoder_steps": 1,
+    "batch_size": 32,
+    "Epochs": 20,
+    "channel": "noise_only_hf1",
+    "run_name": "20251211-224523_bits16_eps0.4_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnoise_only_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251211-224523_bits16_eps0.4_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnoise_only_hf1.png",
+    "eval_exists": false,
+    "metrics": {}
+  },
+  {
+    "Date": "20251211",
+    "Time": "154331",
+    "bits": 16,
+    "eps": 0.3,
+    "alpha": 0.0,
+    "beta": 0.0,
+    "mask_reg": 0.0001,
+    "logit_reg": 0.0001,
+    "decoder_lr": "1e-4",
+    "decoder_steps": 1,
+    "batch_size": 32,
+    "Epochs": 20,
+    "channel": "noise_only_hf1",
+    "run_name": "20251211-154331_bits16_eps0.3_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnoise_only_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251211-154331_bits16_eps0.3_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnoise_only_hf1.png",
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.1227,
+        "snr": 13.3,
+        "lsd": 0.03
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.3207,
+        "snr": 13.3,
+        "lsd": 0.03
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4283,
+        "snr": 13.3,
+        "lsd": 0.03
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4533,
+        "snr": 13.3,
+        "lsd": 0.03
+      },
+      "MP3 (128k)": {
+        "ber": 0.2155,
+        "snr": 13.3,
+        "lsd": 0.03
+      },
+      "MP3 (64k)": {
+        "ber": 0.28,
+        "snr": 13.3,
+        "lsd": 0.03
+      },
+      "AAC (128k)": {
+        "ber": 0.1869,
+        "snr": 13.3,
+        "lsd": 0.03
+      },
+      "Quant (12-bit)": {
+        "ber": 0.1898,
+        "snr": 13.3,
+        "lsd": 0.03
+      },
+      "Random EQ": {
+        "ber": 0.2507,
+        "snr": 13.3,
+        "lsd": 0.03
+      }
+    }
+  },
+  {
     "Date": "20251211",
     "Time": "124606",
     "bits": 16,
@@ -17,8 +147,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251211-124606_bits16_eps0.5_alpha0.0_beta0.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.0765,
+        "snr": 13.68,
+        "lsd": 0.031
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.2723,
+        "snr": 13.68,
+        "lsd": 0.031
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4508,
+        "snr": 13.68,
+        "lsd": 0.031
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4527,
+        "snr": 13.68,
+        "lsd": 0.031
+      },
+      "MP3 (128k)": {
+        "ber": 0.1561,
+        "snr": 13.68,
+        "lsd": 0.031
+      },
+      "MP3 (64k)": {
+        "ber": 0.2296,
+        "snr": 13.68,
+        "lsd": 0.031
+      },
+      "AAC (128k)": {
+        "ber": 0.1402,
+        "snr": 13.68,
+        "lsd": 0.031
+      },
+      "Quant (12-bit)": {
+        "ber": 0.1352,
+        "snr": 13.68,
+        "lsd": 0.031
+      },
+      "Random EQ": {
+        "ber": 0.1612,
+        "snr": 13.68,
+        "lsd": 0.031
+      }
+    }
   },
   {
     "Date": "20251211",
@@ -38,8 +214,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251211-102617_bits16_eps0.5_alpha0.1_beta0.1_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.0901,
+        "snr": 15.62,
+        "lsd": 0.03
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.2947,
+        "snr": 15.62,
+        "lsd": 0.03
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4787,
+        "snr": 15.62,
+        "lsd": 0.03
+      },
+      "Resample (1.1x)": {
+        "ber": 0.485,
+        "snr": 15.62,
+        "lsd": 0.03
+      },
+      "MP3 (128k)": {
+        "ber": 0.1705,
+        "snr": 15.62,
+        "lsd": 0.03
+      },
+      "MP3 (64k)": {
+        "ber": 0.2476,
+        "snr": 15.62,
+        "lsd": 0.03
+      },
+      "AAC (128k)": {
+        "ber": 0.164,
+        "snr": 15.62,
+        "lsd": 0.03
+      },
+      "Quant (12-bit)": {
+        "ber": 0.1511,
+        "snr": 15.62,
+        "lsd": 0.03
+      },
+      "Random EQ": {
+        "ber": 0.1305,
+        "snr": 15.62,
+        "lsd": 0.03
+      }
+    }
   },
   {
     "Date": "20251210",
@@ -59,8 +281,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251210-233808_bits16_eps0.4_alpha0.0_beta0.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.0988,
+        "snr": 19.28,
+        "lsd": 0.02
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.3018,
+        "snr": 19.28,
+        "lsd": 0.02
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4456,
+        "snr": 19.28,
+        "lsd": 0.02
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4471,
+        "snr": 19.28,
+        "lsd": 0.02
+      },
+      "MP3 (128k)": {
+        "ber": 0.1856,
+        "snr": 19.28,
+        "lsd": 0.02
+      },
+      "MP3 (64k)": {
+        "ber": 0.2609,
+        "snr": 19.28,
+        "lsd": 0.02
+      },
+      "AAC (128k)": {
+        "ber": 0.1771,
+        "snr": 19.28,
+        "lsd": 0.02
+      },
+      "Quant (12-bit)": {
+        "ber": 0.1608,
+        "snr": 19.28,
+        "lsd": 0.02
+      },
+      "Random EQ": {
+        "ber": 0.1969,
+        "snr": 19.28,
+        "lsd": 0.02
+      }
+    }
   },
   {
     "Date": "20251210",
@@ -80,8 +348,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251210-211954_bits16_eps0.3_alpha0.0_beta0.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.1627,
+        "snr": 20.89,
+        "lsd": 0.013
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.3491,
+        "snr": 20.89,
+        "lsd": 0.013
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4786,
+        "snr": 20.89,
+        "lsd": 0.013
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4832,
+        "snr": 20.89,
+        "lsd": 0.013
+      },
+      "MP3 (128k)": {
+        "ber": 0.2403,
+        "snr": 20.89,
+        "lsd": 0.013
+      },
+      "MP3 (64k)": {
+        "ber": 0.3052,
+        "snr": 20.89,
+        "lsd": 0.013
+      },
+      "AAC (128k)": {
+        "ber": 0.2312,
+        "snr": 20.89,
+        "lsd": 0.013
+      },
+      "Quant (12-bit)": {
+        "ber": 0.221,
+        "snr": 20.89,
+        "lsd": 0.013
+      },
+      "Random EQ": {
+        "ber": 0.2152,
+        "snr": 20.89,
+        "lsd": 0.013
+      }
+    }
   },
   {
     "Date": "20251210",
@@ -101,8 +415,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251210-151800_bits16_eps0.2_alpha0.0_beta0.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.2058,
+        "snr": 29.48,
+        "lsd": 0.006
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.383,
+        "snr": 29.48,
+        "lsd": 0.006
+      },
+      "Resample (0.9x)": {
+        "ber": 0.477,
+        "snr": 29.48,
+        "lsd": 0.006
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4817,
+        "snr": 29.48,
+        "lsd": 0.006
+      },
+      "MP3 (128k)": {
+        "ber": 0.2938,
+        "snr": 29.48,
+        "lsd": 0.006
+      },
+      "MP3 (64k)": {
+        "ber": 0.3488,
+        "snr": 29.48,
+        "lsd": 0.006
+      },
+      "AAC (128k)": {
+        "ber": 0.279,
+        "snr": 29.48,
+        "lsd": 0.006
+      },
+      "Quant (12-bit)": {
+        "ber": 0.2699,
+        "snr": 29.48,
+        "lsd": 0.006
+      },
+      "Random EQ": {
+        "ber": 0.2863,
+        "snr": 29.48,
+        "lsd": 0.006
+      }
+    }
   },
   {
     "Date": "20251209",
@@ -122,8 +482,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251209-224948_bits16_eps0.05_alpha1.0_beta1.0_mask0.1_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chnoise_only_hf1.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.4746,
+        "snr": 53.35,
+        "lsd": 0.001
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.4923,
+        "snr": 53.35,
+        "lsd": 0.001
+      },
+      "Resample (0.9x)": {
+        "ber": 0.499,
+        "snr": 53.35,
+        "lsd": 0.001
+      },
+      "Resample (1.1x)": {
+        "ber": 0.5018,
+        "snr": 53.35,
+        "lsd": 0.001
+      },
+      "MP3 (128k)": {
+        "ber": 0.4799,
+        "snr": 53.35,
+        "lsd": 0.001
+      },
+      "MP3 (64k)": {
+        "ber": 0.485,
+        "snr": 53.35,
+        "lsd": 0.001
+      },
+      "AAC (128k)": {
+        "ber": 0.4816,
+        "snr": 53.35,
+        "lsd": 0.001
+      },
+      "Quant (12-bit)": {
+        "ber": 0.4806,
+        "snr": 53.35,
+        "lsd": 0.001
+      },
+      "Random EQ": {
+        "ber": 0.4833,
+        "snr": 53.35,
+        "lsd": 0.001
+      }
+    }
   },
   {
     "Date": "20251209",
@@ -143,8 +549,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251209-153608_bits16_eps0.2_alpha0.1_beta0.1_mask0.01_logit0.01_decLR3e-4_decSteps0_bs32_ep10_chfull_hf0.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.2557,
+        "snr": 16.36,
+        "lsd": 0.009
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.4113,
+        "snr": 16.36,
+        "lsd": 0.009
+      },
+      "Resample (0.9x)": {
+        "ber": 0.5045,
+        "snr": 16.36,
+        "lsd": 0.009
+      },
+      "Resample (1.1x)": {
+        "ber": 0.501,
+        "snr": 16.36,
+        "lsd": 0.009
+      },
+      "MP3 (128k)": {
+        "ber": 0.345,
+        "snr": 16.36,
+        "lsd": 0.009
+      },
+      "MP3 (64k)": {
+        "ber": 0.3786,
+        "snr": 16.36,
+        "lsd": 0.009
+      },
+      "AAC (128k)": {
+        "ber": 0.3449,
+        "snr": 16.36,
+        "lsd": 0.009
+      },
+      "Quant (12-bit)": {
+        "ber": 0.3092,
+        "snr": 16.36,
+        "lsd": 0.009
+      },
+      "Random EQ": {
+        "ber": 0.2861,
+        "snr": 16.36,
+        "lsd": 0.009
+      }
+    }
   },
   {
     "Date": "20251201",
@@ -164,8 +616,54 @@ window.resultsData = [
     "enc_checkpoint": true,
     "dec_checkpoint": true,
     "plot_url": "plots/20251201-164410_bits16_eps0.2_alpha0.0_beta0.0_mask0.0_logit0.0_decLR3e-4_decSteps0_bs32_ep20_chnoise_only.png",
-    "eval_exists": false,
-    "metrics": {}
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.168,
+        "snr": 15.44,
+        "lsd": 0.035
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.333,
+        "snr": 15.44,
+        "lsd": 0.035
+      },
+      "Resample (0.9x)": {
+        "ber": 0.3936,
+        "snr": 15.44,
+        "lsd": 0.035
+      },
+      "Resample (1.1x)": {
+        "ber": 0.427,
+        "snr": 15.44,
+        "lsd": 0.035
+      },
+      "MP3 (128k)": {
+        "ber": 0.264,
+        "snr": 15.44,
+        "lsd": 0.035
+      },
+      "MP3 (64k)": {
+        "ber": 0.309,
+        "snr": 15.44,
+        "lsd": 0.035
+      },
+      "AAC (128k)": {
+        "ber": 0.2418,
+        "snr": 15.44,
+        "lsd": 0.035
+      },
+      "Quant (12-bit)": {
+        "ber": 0.2312,
+        "snr": 15.44,
+        "lsd": 0.035
+      },
+      "Random EQ": {
+        "ber": 0.3154,
+        "snr": 15.44,
+        "lsd": 0.035
+      }
+    }
   },
   {
     "Date": "20251201",

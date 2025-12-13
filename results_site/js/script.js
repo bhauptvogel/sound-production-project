@@ -33,7 +33,7 @@ function populateFilters(data) {
     const epochs = new Set();
 
     data.forEach(row => {
-        if (row.channel) channels.add(row.channel);
+        if (row.channel) channels.add(row.channel.replace(/_hf\d+$/, ''));
         if (row.bits !== undefined) bits.add(row.bits);
         if (row.eps !== undefined) eps.add(row.eps);
         if (row.alpha !== undefined) alphas.add(row.alpha);
@@ -68,25 +68,22 @@ function populateSelect(id, values) {
 
 function populateMetricOptions(data) {
     const select = document.getElementById('metric-select');
-    const availableMetrics = new Set();
+    const availableAttacks = new Set();
     
-    // Scan all data to find all possible metric keys
+    // Scan all data to find all possible attacks
     data.forEach(row => {
         if (row.metrics) {
             Object.keys(row.metrics).forEach(attack => {
-                // For each attack, we have sub-metrics like ber, snr, lsd
-                ['BER', 'SNR', 'LSD'].forEach(sub => {
-                    availableMetrics.add(`${attack} ${sub}`);
-                });
+                availableAttacks.add(attack);
             });
         }
     });
     
     // Sort and add to select
-    Array.from(availableMetrics).sort().forEach(m => {
+    Array.from(availableAttacks).sort().forEach(attack => {
         const option = document.createElement('option');
-        option.value = m;
-        option.textContent = m;
+        option.value = attack;
+        option.textContent = attack;
         select.appendChild(option);
     });
 }
@@ -113,7 +110,10 @@ function applyFilters() {
         if (!matchText) return false;
 
         // Dropdowns
-        if (filterChannel !== 'all' && String(row.channel) !== filterChannel) return false;
+        if (filterChannel !== 'all') {
+            const rowChannel = row.channel ? String(row.channel).replace(/_hf\d+$/, '') : '';
+            if (rowChannel !== filterChannel) return false;
+        }
         if (filterBits !== 'all' && String(row.bits) !== filterBits) return false;
         if (filterEps !== 'all' && String(row.eps) !== filterEps) return false;
         if (filterAlpha !== 'all' && String(row.alpha) !== filterAlpha) return false;
@@ -362,10 +362,10 @@ function toggleStats(btn) {
 // --- Chart Generation ---
 function generateChart() {
     const metricSelect = document.getElementById('metric-select');
-    const metricKey = metricSelect.value;
+    const attackName = metricSelect.value;
     
-    if (!metricKey) {
-        alert('Please select a metric first.');
+    if (!attackName) {
+        alert('Please select an attack first.');
         return;
     }
 
@@ -379,12 +379,6 @@ function generateChart() {
 
     const xAxisSelect = document.getElementById('xaxis-select');
     const xAxisKey = xAxisSelect.value; // "" (Date-Time) or "eps", "beta", etc.
-
-    // metricKey is something like "Identity SNR" or "Quantization BER"
-    const lastSpaceIndex = metricKey.lastIndexOf(' ');
-    const attackName = metricKey.substring(0, lastSpaceIndex);
-    const subMetric = metricKey.substring(lastSpaceIndex + 1);
-    const metricKeyLower = subMetric.toLowerCase();
 
     const ctx = document.getElementById('comparisonChart').getContext('2d');
     const chartWrapper = document.querySelector('.chart-wrapper');
@@ -410,9 +404,17 @@ function generateChart() {
         }
     });
 
-    const values = dataForChart.map(row => {
+    const berValues = dataForChart.map(row => {
         if (row.metrics && row.metrics[attackName]) {
-            const val = row.metrics[attackName][metricKeyLower];
+            const val = row.metrics[attackName]['ber'];
+            return val !== undefined && val !== null ? val : null;
+        }
+        return null;
+    });
+
+    const snrValues = dataForChart.map(row => {
+        if (row.metrics && row.metrics[attackName]) {
+            const val = row.metrics[attackName]['snr'];
             return val !== undefined && val !== null ? val : null;
         }
         return null;
@@ -421,28 +423,58 @@ function generateChart() {
     myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels, // These are equidistant labels, preserving order of dataForChart
-            datasets: [{
-                label: metricKey,
-                data: values,
-                backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                borderColor: 'rgba(0, 123, 255, 1)',
-                borderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6,
-                fill: true,
-                tension: 0.1
-            }]
+            labels: labels, 
+            datasets: [
+                {
+                    label: `${attackName} BER`,
+                    data: berValues,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0.1,
+                    yAxisID: 'y'
+                },
+                {
+                    label: `${attackName} SNR`,
+                    data: snrValues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0.1,
+                    yAxisID: 'y1'
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
                 y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: subMetric
+                        text: 'BER'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'SNR (dB)'
+                    },
+                    grid: {
+                        drawOnChartArea: false // only want the grid lines for one axis to show up
                     }
                 },
                 x: {
@@ -467,17 +499,21 @@ function generateChart() {
                         },
                         label: (context) => {
                              const val = context.raw !== null ? context.raw : 'N/A';
-                             return `${metricKey}: ${val}`;
+                             return `${context.dataset.label}: ${val}`;
                         },
                         afterLabel: (context) => {
-                            const idx = context[0].dataIndex;
-                            const row = dataForChart[idx];
-                            return [
-                                `Channel: ${row.channel}`,
-                                `Bits: ${row.bits}, Eps: ${row.eps}`,
-                                `Alpha: ${row.alpha}, Beta: ${row.beta}`,
-                                `MaskReg: ${row.mask_reg}, LogitReg: ${row.logit_reg}`
-                            ];
+                            // Only show detailed info once per tooltip
+                            if (context.datasetIndex === 0) {
+                                const idx = context.dataIndex;
+                                const row = dataForChart[idx];
+                                return [
+                                    `Channel: ${row.channel}`,
+                                    `Bits: ${row.bits}, Eps: ${row.eps}`,
+                                    `Alpha: ${row.alpha}, Beta: ${row.beta}`,
+                                    `MaskReg: ${row.mask_reg}, LogitReg: ${row.logit_reg}`
+                                ];
+                            }
+                            return null;
                         }
                     }
                 },

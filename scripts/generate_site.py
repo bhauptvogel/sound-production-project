@@ -9,7 +9,7 @@ import pandas as pd
 
 def parse_filename(filename):
     # 20251126-234814_bits16_eps0.2_alpha0.0_beta0.0_mask0.0_logit0.0_decLR5e-4_decSteps0_bs32_ep10_chnone.txt
-    pattern = r"^(\d{8})-(\d{6})_bits(\d+)_eps([\d\.]+)_alpha([\d\.]+)_beta([\d\.]+)_mask([\d\.]+)_logit([\d\.]+)_decLR([\d\.e\-]+)_decSteps(\d+)_bs(\d+)_ep(\d+)_ch(\w+)\.txt$"
+    pattern = r"^(\d{8})-(\d{6})_bits(\d+)_eps([\d\.e\-]+)_alpha([\d\.e\-]+)_beta([\d\.e\-]+)_mask([\d\.e\-]+)_logit([\d\.e\-]+)_decLR([\d\.e\-]+)_decSteps(\d+)_bs(\d+)_ep(\d+)_ch(\w+)\.txt$"
     match = re.match(pattern, filename)
     if match:
         return {
