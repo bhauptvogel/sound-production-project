@@ -1,5 +1,181 @@
 window.resultsData = [
   {
+    "Date": "20251214",
+    "Time": "040608",
+    "bits": 16,
+    "eps": 0.4,
+    "alpha": 0.0,
+    "beta": 0.0,
+    "mask_reg": 0.0001,
+    "logit_reg": 0.0001,
+    "decoder_lr": "1e-4",
+    "decoder_steps": 1,
+    "batch_size": 32,
+    "Epochs": 20,
+    "channel": "full_hf1",
+    "run_name": "20251214-040608_bits16_eps0.4_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chfull_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251214-040608_bits16_eps0.4_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chfull_hf1.png",
+    "eval_exists": false,
+    "metrics": {}
+  },
+  {
+    "Date": "20251213",
+    "Time": "223646",
+    "bits": 16,
+    "eps": 0.4,
+    "alpha": 0.0,
+    "beta": 0.0,
+    "mask_reg": 0.0001,
+    "logit_reg": 0.0001,
+    "decoder_lr": "1e-4",
+    "decoder_steps": 1,
+    "batch_size": 32,
+    "Epochs": 20,
+    "channel": "none_hf1",
+    "run_name": "20251213-223646_bits16_eps0.4_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnone_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251213-223646_bits16_eps0.4_alpha0.0_beta0.0_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnone_hf1.png",
+    "eval_exists": false,
+    "metrics": {}
+  },
+  {
+    "Date": "20251213",
+    "Time": "164734",
+    "bits": 16,
+    "eps": 0.4,
+    "alpha": 0.1,
+    "beta": 0.1,
+    "mask_reg": 0.0001,
+    "logit_reg": 0.0001,
+    "decoder_lr": "1e-4",
+    "decoder_steps": 1,
+    "batch_size": 32,
+    "Epochs": 20,
+    "channel": "full_hf1",
+    "run_name": "20251213-164734_bits16_eps0.4_alpha0.1_beta0.1_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chfull_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251213-164734_bits16_eps0.4_alpha0.1_beta0.1_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chfull_hf1.png",
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.1234,
+        "snr": 11.58,
+        "lsd": 0.033
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.3357,
+        "snr": 11.58,
+        "lsd": 0.033
+      },
+      "Resample (0.9x)": {
+        "ber": 0.482,
+        "snr": 11.58,
+        "lsd": 0.033
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4743,
+        "snr": 11.58,
+        "lsd": 0.033
+      },
+      "MP3 (128k)": {
+        "ber": 0.2129,
+        "snr": 11.58,
+        "lsd": 0.033
+      },
+      "MP3 (64k)": {
+        "ber": 0.2807,
+        "snr": 11.58,
+        "lsd": 0.033
+      },
+      "AAC (128k)": {
+        "ber": 0.2,
+        "snr": 11.58,
+        "lsd": 0.033
+      },
+      "Quant (12-bit)": {
+        "ber": 0.1957,
+        "snr": 11.58,
+        "lsd": 0.033
+      },
+      "Random EQ": {
+        "ber": 0.1608,
+        "snr": 11.58,
+        "lsd": 0.033
+      }
+    }
+  },
+  {
+    "Date": "20251213",
+    "Time": "111111",
+    "bits": 16,
+    "eps": 0.4,
+    "alpha": 0.1,
+    "beta": 0.1,
+    "mask_reg": 0.0001,
+    "logit_reg": 0.0001,
+    "decoder_lr": "1e-4",
+    "decoder_steps": 1,
+    "batch_size": 32,
+    "Epochs": 20,
+    "channel": "noise_only_hf1",
+    "run_name": "20251213-111111_bits16_eps0.4_alpha0.1_beta0.1_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnoise_only_hf1",
+    "enc_checkpoint": true,
+    "dec_checkpoint": true,
+    "plot_url": "plots/20251213-111111_bits16_eps0.4_alpha0.1_beta0.1_mask1e-4_logit1e-4_decLR1e-4_decSteps1_bs32_ep20_chnoise_only_hf1.png",
+    "eval_exists": true,
+    "metrics": {
+      "Identity": {
+        "ber": 0.0848,
+        "snr": 10.13,
+        "lsd": 0.048
+      },
+      "Noise (std=0.01)": {
+        "ber": 0.2966,
+        "snr": 10.13,
+        "lsd": 0.048
+      },
+      "Resample (0.9x)": {
+        "ber": 0.4291,
+        "snr": 10.13,
+        "lsd": 0.048
+      },
+      "Resample (1.1x)": {
+        "ber": 0.4406,
+        "snr": 10.13,
+        "lsd": 0.048
+      },
+      "MP3 (128k)": {
+        "ber": 0.1748,
+        "snr": 10.13,
+        "lsd": 0.048
+      },
+      "MP3 (64k)": {
+        "ber": 0.2574,
+        "snr": 10.13,
+        "lsd": 0.048
+      },
+      "AAC (128k)": {
+        "ber": 0.1522,
+        "snr": 10.13,
+        "lsd": 0.048
+      },
+      "Quant (12-bit)": {
+        "ber": 0.1576,
+        "snr": 10.13,
+        "lsd": 0.048
+      },
+      "Random EQ": {
+        "ber": 0.209,
+        "snr": 10.13,
+        "lsd": 0.048
+      }
+    }
+  },
+  {
     "Date": "20251212",
     "Time": "182237",
     "bits": 16,
