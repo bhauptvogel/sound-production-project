@@ -227,7 +227,6 @@ def run_eval(args):
         else:
             num_iters = dataset_len
             print(f"Evaluating on {num_iters} clips (full '{args.split}' split)")
-
     elif args.input_file:
         # Single file mode
         print(f"Evaluating on single file: {args.input_file}")
@@ -323,12 +322,17 @@ def run_eval(args):
             Y_complex = apply_watermark_mask(X, M, args.eps)
             y_watermarked = istft(Y_complex, stft_cfg, length=wav_in.shape[-1])
             
-            # Audio Metrics (Clean vs Watermarked)
-            snr_val = snr_db(wav_in, y_watermarked)
-            lsd_val = log_spectral_distance_weighted(wav_in, y_watermarked, spec_loss_cfg).item()
+            # --- Metrics recomputed per attack ---
+            # Original code computed snr_val and lsd_val here (only once for Identity)
+            # We will now compute them inside the loop for each attack.
             
-        # Save sample pairs if requested
+        # Save sample pairs if requested (only for Identity/Original, typically)
+        # We save the "clean" watermarked version before attacks
         if save_samples_dir and samples_saved_count < args.num_save_samples:
+            # Compute Identity metrics just for logging info
+            snr_identity = snr_db(wav_in, y_watermarked)
+            lsd_identity = log_spectral_distance_weighted(wav_in, y_watermarked, spec_loss_cfg).item()
+
             # Save original
             orig_path = save_samples_dir / f"sample{samples_saved_count}_original.wav"
             save_audio(orig_path, wav_in.squeeze(0), args.sample_rate)
@@ -340,16 +344,23 @@ def run_eval(args):
             # Write text file with info
             info_path = save_samples_dir / f"sample{samples_saved_count}_info.txt"
             with open(info_path, "w") as f:
-                f.write(f"SNR: {snr_val:.2f} dB\n")
-                f.write(f"LSD: {lsd_val:.4f}\n")
+                f.write(f"Identity SNR: {snr_identity:.2f} dB\n")
+                f.write(f"Identity LSD: {lsd_identity:.4f}\n")
                 f.write(f"Bits: {bits.cpu().int().tolist()}\n")
             
             samples_saved_count += 1
 
         # For each attack
         for atk_name, atk_fn in attacks:
+            # Apply attack
             y_att = atk_fn(y_watermarked)
             
+            # Compute Metrics (SNR/LSD) for THIS attack
+            # SNR is typically Watermarked(Attacked) vs Original Clean
+            # LSD is typically Watermarked(Attacked) vs Original Clean
+            cur_snr = snr_db(wav_in, y_att)
+            cur_lsd = log_spectral_distance_weighted(wav_in, y_att, spec_loss_cfg).item()
+
             # Decode
             bits_hat = decode_bits(decoder, y_att, stft_cfg)
             
@@ -359,21 +370,22 @@ def run_eval(args):
             
             agg = results_agg[atk_name]
             agg["ber_sum"] += ber
-            agg["snr_sum"] += snr_val 
-            agg["lsd_sum"] += lsd_val
+            agg["snr_sum"] += cur_snr
+            agg["lsd_sum"] += cur_lsd
             agg["count"] += 1
             
             if args.input_file:
                 single_file_results.append({
                     "attack": atk_name,
                     "ber": ber,
-                    "snr": snr_val,
-                    "lsd": lsd_val,
+                    "snr": cur_snr,
+                    "lsd": cur_lsd,
                     "recovered_bits": bits_hat.cpu().int().numpy().tolist()[0],
                     "original_bits": bits.cpu().int().numpy().tolist()[0]
                 })
                 
                 if args.save_audio:
+                    # Save attacked versions too if needed
                     out_name = Path(args.output_dir) / f"watermarked_{atk_name.replace(' ', '_').replace('(', '').replace(')', '')}.wav"
                     save_audio(out_name, y_att.squeeze(0).cpu(), args.sample_rate)
 

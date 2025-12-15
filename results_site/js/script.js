@@ -156,6 +156,97 @@ function resetFilters() {
     applyFilters();
 }
 
+function exportCSV() {
+    if (!currentData || currentData.length === 0) {
+        alert("No data to export.");
+        return;
+    }
+
+    // 1. Collect all unique attack names from the current filtered data
+    const attackNames = new Set();
+    currentData.forEach(row => {
+        if (row.metrics) {
+            Object.keys(row.metrics).forEach(attack => attackNames.add(attack));
+        }
+    });
+    const sortedAttacks = Array.from(attackNames).sort();
+
+    // 2. Define headers
+    // Standard headers
+    const headers = [
+        "Date", "Time", "bits", "eps", "alpha", "beta", 
+        "mask_reg", "logit_reg", "decoder_lr", "decoder_steps", 
+        "batch_size", "Epochs", "channel"
+    ];
+    
+    // Dynamic headers for metrics (ber, snr, lsd for each attack)
+    sortedAttacks.forEach(attack => {
+        headers.push(`eval_${attack}_ber`);
+        headers.push(`eval_${attack}_snr`);
+        headers.push(`eval_${attack}_lsd`);
+    });
+
+    // 3. Build CSV rows
+    const csvRows = [];
+    csvRows.push(headers.join(",")); // Header row
+
+    const valOrEmpty = (v) => (v !== undefined && v !== null) ? v : "";
+
+    currentData.forEach(row => {
+        const rowData = [];
+        
+        // Standard fields
+        rowData.push(valOrEmpty(row.Date));
+        rowData.push(valOrEmpty(row.Time));
+        rowData.push(valOrEmpty(row.bits));
+        rowData.push(valOrEmpty(row.eps));
+        rowData.push(valOrEmpty(row.alpha));
+        rowData.push(valOrEmpty(row.beta));
+        rowData.push(valOrEmpty(row.mask_reg));
+        rowData.push(valOrEmpty(row.logit_reg));
+        rowData.push(valOrEmpty(row.decoder_lr));
+        rowData.push(valOrEmpty(row.decoder_steps));
+        rowData.push(valOrEmpty(row.batch_size));
+        rowData.push(valOrEmpty(row.Epochs));
+        rowData.push(valOrEmpty(row.channel));
+
+        // Dynamic metric fields
+        sortedAttacks.forEach(attack => {
+            if (row.metrics && row.metrics[attack]) {
+                const m = row.metrics[attack];
+                rowData.push(m.ber !== null && m.ber !== undefined ? m.ber : "");
+                rowData.push(m.snr !== null && m.snr !== undefined ? m.snr : "");
+                rowData.push(m.lsd !== null && m.lsd !== undefined ? m.lsd : "");
+            } else {
+                rowData.push("", "", "");
+            }
+        });
+
+        // Escape fields if necessary (simple CSV escaping: quotes around fields with commas)
+        const escapedRow = rowData.map(val => {
+            const strVal = String(val);
+            if (strVal.includes(",") || strVal.includes("\n") || strVal.includes('"')) {
+                return `"${strVal.replace(/"/g, '""')}"`;
+            }
+            return strVal;
+        });
+
+        csvRows.push(escapedRow.join(","));
+    });
+
+    // 4. Trigger download
+    const csvString = csvRows.join("\n");
+    const blob = new Blob([csvString], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'filtered_results.csv');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
 // --- Sorting Logic ---
 function handleSort(key) {
     if (sortState.key === key) {
@@ -286,10 +377,10 @@ function renderTable(data) {
             displayChannel = displayChannel.replace(/_hf\d+$/, '');
         }
 
-        if (row.channel === 'none') channelClass = 'channel-none';
+        if (row.channel.startsWith('none')) channelClass = 'channel-none';
         else if (row.channel.startsWith('noise_only')) channelClass = 'channel-noise';
         else if (row.channel === 'full') channelClass = 'channel-full';
-        else if (row.channel === 'full_hf0') channelClass = 'channel-full-hf0';
+        else if (row.channel.startsWith('full_hf')) channelClass = 'channel-full-hf0';
         
         const channelCell = `<td><span class="channel-badge ${channelClass}">${displayChannel}</span></td>`;
 
