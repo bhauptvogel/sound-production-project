@@ -55,7 +55,7 @@ BETA=0.0
 MASK_REG=1e-4
 LOGIT_REG=1e-4
 DECODER_LR=1e-4
-DECODER_STEPS=1
+DECODER_STEPS=2
 SAVE_PT=1 # 1 = save checkpoints, 0 = don't save
 CHANNEL_MODE="full" # default stage
 USE_HF=1 # 0 = auto-detect, 1 = force HF
