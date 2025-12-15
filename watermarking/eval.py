@@ -15,6 +15,7 @@ import torch.nn.functional as F
 import numpy as np
 from tqdm import tqdm
 import soundfile as sf
+from torch.utils.data import DataLoader
 
 from watermarking.models import (
     WatermarkEncoder,
@@ -162,6 +163,22 @@ def decode_bits(
         probs = torch.sigmoid(logits)
         return (probs > 0.5).float()
 
+def snr_db_batch(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    """
+    Compute SNR per element in batch.
+    x, y: (B, T)
+    Returns: (B,)
+    """
+    if x.ndim == 1: x = x.unsqueeze(0)
+    if y.ndim == 1: y = y.unsqueeze(0)
+    
+    # x: (B, T)
+    noise = x - y
+    # Per-element power
+    p_signal = torch.mean(x**2, dim=-1) + 1e-12
+    p_noise = torch.mean(noise**2, dim=-1) + 1e-12
+    
+    return 10.0 * torch.log10(p_signal / p_noise)
 
 def run_eval(args):
     device = torch.device(args.device)
@@ -218,19 +235,26 @@ def run_eval(args):
             split=args.split,
         )
 
+    loader = None
     if dataset:
         # Use full dataset length unless num_clips is explicitly smaller
         dataset_len = len(dataset)
         if args.num_clips is not None and args.num_clips > 0 and args.num_clips < dataset_len:
-            num_iters = args.num_clips
-            print(f"Evaluating on {num_iters} clips (subset of {dataset_len} in '{args.split}' split)")
+            # We can't easily subset a random access dataset without creating a subset class or just iterating
+            # But RandomClipDataset is random access.
+            # We will use Range sampler or similar if needed, but simplest is to just break loop.
+            dataset_len = args.num_clips # Just for print
+            print(f"Evaluating on {dataset_len} clips (subset of {len(dataset)} in '{args.split}' split)")
         else:
-            num_iters = dataset_len
-            print(f"Evaluating on {num_iters} clips (full '{args.split}' split)")
+            print(f"Evaluating on {dataset_len} clips (full '{args.split}' split)")
+        
+        loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=2, drop_last=False)
+
     elif args.input_file:
         # Single file mode
         print(f"Evaluating on single file: {args.input_file}")
-        num_iters = 1
+        # Mock loader
+        loader = None
     else:
         # Should be covered by dataset loading logic, but just in case
         raise ValueError("Must provide either --eval-dir, --input-file, or allow HF dataset fallback")
@@ -296,59 +320,88 @@ def run_eval(args):
     wav_in_single = None
     if args.input_file:
         wav_in_single, _ = load_audio(args.input_file, target_sr=args.sample_rate, mono=True)
-        wav_in_single = wav_in_single.unsqueeze(0).to(device) # (1, T)
-    
-    pbar = tqdm(range(num_iters), desc="Eval")
+        # Add batch dim (1, T) -> (1, 1, T) if 3D needed? No, (B, T)
+        # load_audio returns (1, T)
+        # We need (B, T)
+        wav_in_single = wav_in_single # (1, T)
     
     samples_saved_count = 0
+    total_clips_processed = 0
 
-    for i in pbar:
-        if dataset:
-            # If we are iterating sequentially
-            wav_in = dataset[i].unsqueeze(0).to(device) # (1, T)
-        else:
-            wav_in = wav_in_single
+    # Prepare iterator
+    if loader:
+        iterator = tqdm(loader, desc="Eval")
+    else:
+        # Single file case: make a list of one item
+        iterator = tqdm([wav_in_single], desc="Eval Single")
+
+    from watermarking.models import apply_watermark_mask
+    from watermarking.stft_utils import istft
+
+    for wav_in in iterator:
+        # Check if we exceeded num_clips
+        if args.num_clips is not None and total_clips_processed >= args.num_clips:
+            break
+
+        wav_in = wav_in.to(device)
+        # Ensure (B, T)
+        if wav_in.ndim == 1:
+            wav_in = wav_in.unsqueeze(0)
         
+        B = wav_in.shape[0]
+        
+        # If we only need a few more clips to reach num_clips limit
+        if args.num_clips is not None and total_clips_processed + B > args.num_clips:
+            cutoff = args.num_clips - total_clips_processed
+            wav_in = wav_in[:cutoff]
+            B = cutoff
+
         # Generate bits
-        bits = torch.randint(0, 2, (1, args.n_bits), device=device).float()
+        bits = torch.randint(0, 2, (B, args.n_bits), device=device).float()
         
         # Encode
         with torch.no_grad():
             X = stft(wav_in, stft_cfg)
+            # logmag input: (B, 1, F, T)
             logmag = torch.log(X.abs() + 1e-7).unsqueeze(1)
             M = encoder(logmag, bits)
-            from watermarking.models import apply_watermark_mask
-            from watermarking.stft_utils import istft
+            
             Y_complex = apply_watermark_mask(X, M, args.eps)
             y_watermarked = istft(Y_complex, stft_cfg, length=wav_in.shape[-1])
-            
-            # --- Metrics recomputed per attack ---
-            # Original code computed snr_val and lsd_val here (only once for Identity)
-            # We will now compute them inside the loop for each attack.
             
         # Save sample pairs if requested (only for Identity/Original, typically)
         # We save the "clean" watermarked version before attacks
         if save_samples_dir and samples_saved_count < args.num_save_samples:
-            # Compute Identity metrics just for logging info
-            snr_identity = snr_db(wav_in, y_watermarked)
-            lsd_identity = log_spectral_distance_weighted(wav_in, y_watermarked, spec_loss_cfg).item()
+            # We can save samples from this batch
+            start_idx = 0
+            while samples_saved_count < args.num_save_samples and start_idx < B:
+                # Extract single items
+                w_in_curr = wav_in[start_idx]
+                w_wm_curr = y_watermarked[start_idx]
+                bits_curr = bits[start_idx]
 
-            # Save original
-            orig_path = save_samples_dir / f"sample{samples_saved_count}_original.wav"
-            save_audio(orig_path, wav_in.squeeze(0), args.sample_rate)
-            
-            # Save watermarked (Identity attack basically)
-            wm_path = save_samples_dir / f"sample{samples_saved_count}_watermarked.wav"
-            save_audio(wm_path, y_watermarked.squeeze(0), args.sample_rate)
-            
-            # Write text file with info
-            info_path = save_samples_dir / f"sample{samples_saved_count}_info.txt"
-            with open(info_path, "w") as f:
-                f.write(f"Identity SNR: {snr_identity:.2f} dB\n")
-                f.write(f"Identity LSD: {lsd_identity:.4f}\n")
-                f.write(f"Bits: {bits.cpu().int().tolist()}\n")
-            
-            samples_saved_count += 1
+                # Compute Identity metrics just for logging info
+                snr_identity = snr_db_batch(w_in_curr.unsqueeze(0), w_wm_curr.unsqueeze(0)).item()
+                # LSD for single item
+                lsd_identity = log_spectral_distance_weighted(w_in_curr.unsqueeze(0), w_wm_curr.unsqueeze(0), spec_loss_cfg).item()
+
+                # Save original
+                orig_path = save_samples_dir / f"sample{samples_saved_count}_original.wav"
+                save_audio(orig_path, w_in_curr, args.sample_rate)
+                
+                # Save watermarked (Identity attack basically)
+                wm_path = save_samples_dir / f"sample{samples_saved_count}_watermarked.wav"
+                save_audio(wm_path, w_wm_curr, args.sample_rate)
+                
+                # Write text file with info
+                info_path = save_samples_dir / f"sample{samples_saved_count}_info.txt"
+                with open(info_path, "w") as f:
+                    f.write(f"Identity SNR: {snr_identity:.2f} dB\n")
+                    f.write(f"Identity LSD: {lsd_identity:.4f}\n")
+                    f.write(f"Bits: {bits_curr.cpu().int().tolist()}\n")
+                
+                samples_saved_count += 1
+                start_idx += 1
 
         # For each attack
         for atk_name, atk_fn in attacks:
@@ -356,38 +409,59 @@ def run_eval(args):
             y_att = atk_fn(y_watermarked)
             
             # Compute Metrics (SNR/LSD) for THIS attack
-            # SNR is typically Watermarked(Attacked) vs Original Clean
-            # LSD is typically Watermarked(Attacked) vs Original Clean
-            cur_snr = snr_db(wav_in, y_att)
-            cur_lsd = log_spectral_distance_weighted(wav_in, y_att, spec_loss_cfg).item()
+            # snr_db_batch returns (B,)
+            cur_snrs = snr_db_batch(wav_in, y_att)
+            
+            # LSD in losses.py returns scalar mean. We can assume it's mean over batch if we pass batch.
+            # But we want to be consistent. 
+            # If we pass batch to log_spectral_distance_weighted, it computes mean over batch and time and freq.
+            # That is acceptable for "Average LSD".
+            # For strict correctness we might want sum(LSD_i) / N.
+            # But mean(LSD_i) == LSD(batch) because LSD is linear in mean? No, it's mean of (logX - logY)^2. 
+            # Yes, mean of sq diffs is same if computed over batch or averaged over batch.
+            # So passing batch is fine.
+            cur_lsd_scalar = log_spectral_distance_weighted(wav_in, y_att, spec_loss_cfg).item()
 
             # Decode
             bits_hat = decode_bits(decoder, y_att, stft_cfg)
             
             # BER
-            bit_errors = (bits_hat != bits).sum().item()
-            ber = bit_errors / args.n_bits
+            bit_errors = (bits_hat != bits).float().sum() # total errors in batch
+            # BER = total errors / (B * n_bits)
+            # But we aggregate: sum of BERs per sample? Or total BER?
+            # Standard is Total Errors / Total Bits.
+            # aggregated "ber_sum" in code was sum of per-sample BERs.
+            # Let's keep consistency: ber_sum stores sum of BERs.
+            # BER_batch = bit_errors / (B * n_bits) -> this is mean BER.
+            # We want sum of BERs = BER_batch * B
+            
+            total_batch_errors = bit_errors.item()
+            mean_batch_ber = total_batch_errors / (B * args.n_bits)
+            sum_batch_ber = mean_batch_ber * B 
             
             agg = results_agg[atk_name]
-            agg["ber_sum"] += ber
-            agg["snr_sum"] += cur_snr
-            agg["lsd_sum"] += cur_lsd
-            agg["count"] += 1
+            agg["ber_sum"] += sum_batch_ber
+            agg["snr_sum"] += cur_snrs.sum().item()
+            agg["lsd_sum"] += cur_lsd_scalar * B
+            agg["count"] += B
             
             if args.input_file:
+                # We only have 1 item in single file mode usually, but code supports batch=1 logic now
                 single_file_results.append({
                     "attack": atk_name,
-                    "ber": ber,
-                    "snr": cur_snr,
-                    "lsd": cur_lsd,
-                    "recovered_bits": bits_hat.cpu().int().numpy().tolist()[0],
-                    "original_bits": bits.cpu().int().numpy().tolist()[0]
+                    "ber": mean_batch_ber,
+                    "snr": cur_snrs.mean().item(),
+                    "lsd": cur_lsd_scalar,
+                    "recovered_bits": bits_hat[0].cpu().int().numpy().tolist(),
+                    "original_bits": bits[0].cpu().int().numpy().tolist()
                 })
                 
                 if args.save_audio:
                     # Save attacked versions too if needed
                     out_name = Path(args.output_dir) / f"watermarked_{atk_name.replace(' ', '_').replace('(', '').replace(')', '')}.wav"
-                    save_audio(out_name, y_att.squeeze(0).cpu(), args.sample_rate)
+                    save_audio(out_name, y_att[0].cpu(), args.sample_rate)
+        
+        total_clips_processed += B
 
     # Print Summary
     print("\n" + "="*60)
@@ -456,6 +530,7 @@ def main():
     parser.add_argument("--clip-duration", type=float, default=2.0, help="Clip duration (s)")
     parser.add_argument("--sample-rate", type=int, default=44100)
     parser.add_argument("--num-save-samples", type=int, default=5, help="Number of original/watermarked pairs to save for listening")
+    parser.add_argument("--batch-size", type=int, default=1, help="Batch size for evaluation")
     
     # STFT
     parser.add_argument("--n-fft", type=int, default=1024)

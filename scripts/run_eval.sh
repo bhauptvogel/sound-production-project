@@ -25,6 +25,40 @@ mkdir -p "${HF_DATASETS_CACHE}"
 # Force HF to look in workspace for cache
 export XDG_CACHE_HOME="$(pwd)/hf_cache"
 
+# Determine default Batch Size
+BATCH_SIZE=1
+if command -v nvidia-smi &> /dev/null; then
+    GPU_COUNT=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
+    if [ "$GPU_COUNT" -gt 0 ]; then
+        echo "GPU detected. Setting default batch size to 32."
+        BATCH_SIZE=32
+    else
+        echo "No GPU detected via nvidia-smi. Using batch size 1."
+    fi
+else
+    echo "nvidia-smi not found. Using batch size 1."
+fi
+
+# Parse optional --batch-size argument if present in the *beginning* or arguments
+# A simplified parser to extract --batch-size and shift it out.
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --batch-size)
+            BATCH_SIZE="$2"
+            shift # past argument
+            shift # past value
+            ;;
+        *)
+            POSITIONAL_ARGS+=("$1")
+            shift # past argument
+            ;;
+    esac
+done
+
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+
 # Function to run evaluation for a specific pair of checkpoints
 run_evaluation_for_pair() {
     local ENC_CKPT="$1"
@@ -51,6 +85,7 @@ run_evaluation_for_pair() {
     echo "Starting evaluation for: $ENC_STAMP"
     echo "Using Encoder: $ENC_CKPT"
     echo "Using Decoder: $DEC_CKPT"
+    echo "Batch Size: $BATCH_SIZE"
     echo "Output Directory: $OUTPUT_DIR"
 
     # Extract parameters from filename if possible
@@ -87,6 +122,7 @@ run_evaluation_for_pair() {
         --eps "$EPS" \
         --test-all \
         --num-save-samples 5 \
+        --batch-size "$BATCH_SIZE" \
         --output-dir "$OUTPUT_DIR" \
         --output-json "$OUTPUT_DIR/metrics.json"
 
